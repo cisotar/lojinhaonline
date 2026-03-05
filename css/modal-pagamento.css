@@ -1,0 +1,333 @@
+/* ============================================================
+   MODAL DE PAGAMENTO
+   ============================================================ */
+
+/* CABEÇALHO — herda as regras globais de .cabecalho-modal do modal-carrinho.css. */
+
+/* 🔒 ESTADO INICIAL */
+#modal-pagamento {
+    display: none;
+    background: #f4f1ea !important;
+    /* NÃO sobrescreve overflow nem padding-bottom —
+       o scroll já está correto via .conteudo-modal no overlay-modal.css */
+}
+
+/* .conteudo-modal herda flex:1 + overflow-y:auto do overlay-modal.css.
+   Apenas garantimos o padding lateral correto. */
+#modal-pagamento .conteudo-modal {
+    padding: 20px !important;
+}
+
+/* --- CONSOLIDADO DE modal-carrinho.css --- */
+.opcoes-pagamento {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 25px !important;
+    width: 100% !important;
+}
+
+.opcao-pagamento {
+    background: var(--branco);
+    cursor: pointer;
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.opcao-pagamento:hover {
+    border-color: var(--marrom-cafe);
+}
+
+.opcao-pagamento.ativa {
+    border-color: var(--verde-militar);
+    background: var(--branco);
+}
+
+.opcao-cabecalho {
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.opcao-recomendado {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--verde-militar);
+    color: var(--branco);
+    font-size: 0.65rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 900;
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+/* --- CONTEÚDOS EXPANSÍVEIS --- */
+.opcao-conteudo {
+    display: none;
+    margin-top: 15px;
+    padding: 20px;
+    background: var(--branco);
+    border-radius: 12px;
+    border: 1px solid var(--bege-escuro);
+    animation: fadeIn 0.3s ease;
+}
+
+.opcao-pagamento.ativa .opcao-conteudo {
+    display: block;
+}
+
+
+/* Caso você use a div de conteúdo que mencionamos antes */
+#conteudo-pagamento {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+/* 📱 TELEMÓVEL (Padrão) */
+.opcao-pagamento {
+    border-radius: 12px;
+    border: 2px solid var(--cinza-medio);
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.opcao-pagamento:first-child {
+    position: relative !important;
+    padding-top: 20px !important;
+    margin-top: 15px !important;
+    overflow: visible !important;
+}
+
+.opcao-recomendado {
+    position: absolute !important;
+    top: -8px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: var(--verde-militar) !important;
+    color: white !important;
+    font-size: 0.6rem !important;
+    padding: 3px 12px !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+    z-index: 10 !important;
+}
+
+.pix-chave {
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 10px !important;
+    display: flex;
+}
+
+.pix-chave span {
+    font-family: monospace;
+    font-size: 0.85rem !important;
+    color: var(--verde-militar) !important;
+    font-weight: bold;
+    word-break: break-all;
+    margin-bottom: 5px !important;
+}
+
+.pix-qrcode img {
+    width: 150px !important;
+    height: 150px !important;
+}
+
+/* Mensagem "copiado" — oculta por padrão, JS mostra/esconde */
+#mensagem-copiado {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #f0f7ed;
+    border: 1px solid #c8dfc2;
+    border-radius: 10px;
+    color: #4b6b35;
+    font-weight: 800;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+/* Legenda acima do botão chave, com espaço do QR code */
+.pix-legenda {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: center;
+    margin: 14px 0 6px;
+}
+
+/* QR code centralizado, sem margem colada na legenda */
+.pix-qrcode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+/* Botões — margem constante igual ao modal dados-cliente */
+#modal-pagamento .par-botoes {
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+#modal-pagamento .par-botoes .botao-acao {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 14px 0 !important;
+}
+
+
+/* Mensagem "copiado" — oculta por padrão, JS mostra/esconde */
+#mensagem-copiado {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #f0f7ed;
+    border: 1px solid #c8dfc2;
+    border-radius: 10px;
+    color: #4b6b35;
+    font-weight: 800;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+/* Legenda acima do botão chave, com espaço do QR code */
+.pix-legenda {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: center;
+    margin: 14px 0 6px;
+}
+
+/* QR code centralizado */
+.pix-qrcode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 💻 DESKTOP (PC - a partir de 769px) */
+@media (min-width: 769px) {
+    .opcoes-pagamento {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .opcao-pagamento:hover {
+        border-color: var(--marrom-cafe);
+        background-color: var(--bg-creme);
+    }
+
+    .opcao-recomendado {
+        top: -10px !important;
+        left: auto !important;
+        right: 20px !important;
+        transform: none !important;
+    }
+
+    .pix-chave {
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+}
+
+/* ============================================================
+   RESUMO FINANCEIRO — classes compartilhadas entre carrinho
+   e modal de pagamento (gerarHTMLResumo em carrinho.js)
+   ============================================================ */
+
+.resumo-carrinho-container {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--borda-nav);
+    border-radius: 12px;
+    background-color: var(--branco);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: left;
+}
+
+.resumo-cabecalho {
+    background-color: var(--marrom-cafe);
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--borda-nav);
+}
+
+.resumo-titulo {
+    font-size: 13px;
+    color: var(--branco);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resumo-corpo {
+    padding: 15px;
+}
+
+.resumo-linha {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.resumo-linha--desconto .resumo-label,
+.resumo-linha--desconto .resumo-valor {
+    color: var(--red);
+    font-weight: bold;
+}
+
+.resumo-linha--total {
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.resumo-label {
+    font-size: 14px;
+    color: var(--cinza-escuro);
+}
+
+.resumo-valor {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.resumo-label-total {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--verde-militar);
+}
+
+.resumo-valor-total {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--verde-militar);
+}
+
+.resumo-divisor {
+    border-top: 1px dashed var(--borda-nav);
+    margin: 12px 0;
+}

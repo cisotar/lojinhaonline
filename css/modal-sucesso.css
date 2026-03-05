@@ -1,0 +1,48 @@
+/* ============================================================
+   MODAL: SUCESSO
+   ============================================================ */
+
+/* 🔒 ESTADO INICIAL (Obrigatório para não abrir sozinho) */
+#modal-sucesso {
+    display: none;
+}
+
+/* 📱 TELEMÓVEL (Padrão) */
+.conteudo-modal-sucesso {
+    padding: 40px 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icone-sucesso {
+    font-size: 4rem;
+    color: var(--verde-sucesso);
+    margin-bottom: 25px;
+    animation: pulsar 1.5s infinite; /* Animação definida no style.css/layout-base */
+}
+
+.titulo-sucesso {
+    color: var(--verde-sucesso);
+    font-weight: 900;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.texto-agradecimento {
+    font-style: italic;
+    color: var(--marrom-cafe);
+    margin-top: 20px;
+}
+
+/* 💻 PC (Desktop) */
+@media (min-width: 769px) {
+    .conteudo-modal-sucesso {
+        padding: 50px 40px !important;
+    }
+    
+    .titulo-sucesso {
+        font-size: 1.8rem;
+    }
+}

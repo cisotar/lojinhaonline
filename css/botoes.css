@@ -1,0 +1,125 @@
+/* ============================================================
+   BOTÕES - ESTILO ORIGINAL PÃO DO CISO
+   ============================================================ */
+
+/* 📱 TELEMÓVEL (Padrão) */
+
+.botao-acao {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+}
+
+.botao-verde-militar, 
+.botao-avancar {
+    background-color: var(--verde-militar);
+    color: var(--branco);
+    border: none;
+}
+
+.botao-bege {
+    background-color: var(--bege-escuro);
+    color: var(--marrom-cafe);
+    border: 1px solid var(--marrom-detalhe);
+}
+
+.botao-acao:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Botões de Quantidade (Modais) */
+.botao-quantidade {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--verde-militar);
+    background: var(--verde-militar);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+/* Botões de Quantidade Pequenos (Carrinho/Opcionais) */
+.botao-quantidade-pequeno {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--verde-militar);
+    background: var(--verde-militar);
+    color: white;
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+/* 💻 DESKTOP (PC - a partir de 769px) */
+@media (min-width: 769px) {
+    .botao-verde-militar:hover:not(:disabled),
+    .botao-avancar:hover:not(:disabled) {
+        background-color: var(--verde-escuro);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(45, 58, 39, 0.3);
+    }
+
+    .botao-bege:hover:not(:disabled) {
+        background-color: var(--bg-creme);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(139, 69, 19, 0.2);
+    }
+
+    .botao-quantidade:hover,
+    .botao-quantidade-pequeno:hover {
+        background: var(--verde-escuro);
+        color: white;
+        border-color: var(--verde-escuro);
+        transform: scale(1.1);
+    }
+}
+
+/* Ajustes de Responsividade Extraídos do Backup */
+@media (max-width: 768px) {
+    .botao-acao {
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        margin-top: 8px;
+        min-height: unset;
+    }
+
+    .botao-quantidade {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .botao-quantidade-pequeno {
+        width: 25px;
+        height: 25px;
+        font-size: 0.9rem;
+    }
+}

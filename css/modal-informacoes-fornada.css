@@ -1,0 +1,161 @@
+/* ============================================================
+   MODAL: INFORMAÇÕES DA FORNADA - REESTRUTURADO
+   ============================================================ */
+
+/* ── ESTADO INICIAL ──────────────────────────────────────────
+   Em telas muito estreitas o conteúdo pode ultrapassar 75vh.
+   overflow-y:auto garante scroll e display:flex permite que
+   o botão "ENTENDI" use position:sticky no fundo (correção 3).
+   ────────────────────────────────────────────────────────── */
+#modal-informacoes-fornada {
+    display: none;
+    overflow-y: auto !important;
+    max-height: 82vh !important;    /* um pouco acima dos 75vh padrão   */
+}
+
+/* Quando aberto, precisa de flex para o sticky do botão funcionar */
+#modal-informacoes-fornada[style*="display: block"],
+#modal-informacoes-fornada[style*="display:block"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* ── ÍCONE DE INFORMAÇÃO NO TOPO ─────────────────────────── */
+.topo-informacao-fornada {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.topo-informacao-fornada i {
+    font-size: 3rem;
+    color: var(--verde-militar);
+}
+
+/* ── CONTEÚDO PRINCIPAL ──────────────────────────────────── */
+.conteudo-modal-fornada {
+    padding: 25px 25px 10px !important; /* sem padding-bottom generoso;    */
+    overflow-y: visible !important;     /* o scroll é do modal-pai         */
+    flex: 1 1 auto;                     /* ocupa o espaço disponível       */
+}
+
+.conteudo-modal-fornada .titulo-modal {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--marrom-cafe);
+}
+
+/* ── QUADRO DE DESTAQUE (FORNADA E LIMITE) ───────────────── */
+.destaque-fornada {
+    background: var(--bege-escuro);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px dashed var(--marrom-cafe);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+}
+
+.bloco-data {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    align-items: center;
+    text-align: center;
+}
+
+.label-fornada {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.valor-fornada {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--verde-militar);
+    margin-top: 2px;
+}
+
+/* ── LISTA DE DICAS ──────────────────────────────────────── */
+.lista-dicas-fornada {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.dica-fornada {
+    background: var(--branco);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 5px solid var(--verde-militar);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.dica-fornada span,
+.dica-fornada i {
+    font-size: 1.3rem;
+    width: 30px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dica-fornada i {
+    color: var(--verde-militar);
+}
+
+.dica-fornada p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    color: var(--cinza-escuro);
+}
+
+.dica-fornada strong {
+    color: var(--verde-militar);
+}
+
+/* ── BOTÃO "ENTENDI" — sticky no fundo ──────────────────────
+   Sempre visível mesmo em telas muito estreitas onde o modal
+   precisa rolar. O arredondamento inferior combina com o modal.
+   ────────────────────────────────────────────────────────── */
+#modal-informacoes-fornada .botao-acao {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 5 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 0 12px 12px !important;
+    /* Sombra sutil para indicar que há conteúdo acima */
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08) !important;
+}
+
+
+/* ── TELAS MUITO ESTREITAS (≤ 360px) ────────────────────── */
+@media (max-width: 360px) {
+    .label-fornada  { font-size: 0.85rem !important; }
+    .valor-fornada  { font-size: 0.8rem  !important; }
+    .dica-fornada p { font-size: 0.82rem !important; }
+    .titulo-modal   { font-size: 1rem    !important; }
+    .conteudo-modal-fornada { padding: 15px 15px 8px !important; }
+}
+
+
+/* ── 💻 PC (Desktop — a partir de 769px) ────────────────── */
+@media (min-width: 769px) {
+    .dica-fornada {
+        transition: all 0.2s ease;
+    }
+
+    .dica-fornada:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+}

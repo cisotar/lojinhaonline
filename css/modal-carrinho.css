@@ -1,0 +1,571 @@
+/* ============================================================
+   MODAL DO CARRINHO — VISUAL CARDÁPIO
+   ============================================================ */
+
+/* ── CABEÇALHO DOS MODAIS ────────────────────────────────── */
+/*
+   Estrutura real do HTML:
+   <div class="cabecalho-modal">
+       <span class="titulo-cabecalho-modal">Texto</span>
+       <button class="botao-fechar-modal">×</button>
+   </div>
+
+   Estratégia: container position:relative com fundo creme,
+   título ocupa 100% como bloco verde centralizado,
+   botão fechar fica absolute à direita sobreposto ao título.
+*/
+
+.cabecalho-modal {
+    position: relative !important;
+    background: #f4f1ea !important;
+    border-bottom: 1px solid var(--cinza-medio) !important;
+    padding: 12px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 52px !important;
+    border-radius: 15px 15px 0 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Título: bloco verde retangular, largura total, texto centrado */
+.cabecalho-modal .titulo-cabecalho-modal {
+    display: block !important;
+    width: 100% !important;
+    padding: 13px 46px !important; /* espaço dos dois lados p/ o fechar não sobrepor texto */
+    background: var(--verde-militar) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 6px var(--sombra-suave) !important;
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    color: var(--branco) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    box-sizing: border-box !important;
+}
+
+/* Botão fechar: absoluto à direita, centralizado verticalmente sobre o título */
+.cabecalho-modal .botao-fechar-modal {
+    position: absolute !important;
+    right: 22px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(0,0,0,0.22) !important;
+    color: var(--branco) !important;
+    border: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    font-size: 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    box-shadow: none !important;
+    z-index: 2 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+
+/* ── ESTADO INICIAL ──────────────────────────────────────── */
+#modal-carrinho {
+    display: none;
+    overflow-y: auto !important;
+    padding-bottom: 20px !important;
+    background: #f4f1ea !important;
+    scroll-behavior: smooth !important;
+}
+
+/*
+   SCROLL AO TOPO — ao adicionar item ao carrinho em tela pequena,
+   o JS deve rolar o modal de volta ao topo:
+
+       const modal = document.getElementById('modal-carrinho');
+       if (modal) modal.scrollTo({ top: 0, behavior: 'smooth' });
+
+   Ou, se o scroll estiver no overlay/pai:
+       document.querySelector('.conteudo-modal-carrinho')
+               ?.closest('[class*="overlay"], [class*="modal"]')
+               ?.scrollTo({ top: 0, behavior: 'smooth' });
+*/
+
+/* conteudo-modal-carrinho rola normalmente — definido em overlay-modal.css */
+.conteudo-modal-carrinho {
+    padding: 16px !important;
+    background: #f4f1ea;
+}
+
+
+/* ── TÍTULO ──────────────────────────────────────────────── */
+.titulo-carrinho {
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--preto);
+    text-align: center;
+    padding: 10px 14px;
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    margin: 0 0 12px;
+}
+
+
+/* ── LISTA DE ITENS ──────────────────────────────────────── */
+.lista-itens-carrinho {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    padding: 10px 14px;
+    margin-bottom: 12px;
+}
+
+.item-carrinho {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--cinza-divisor);
+}
+
+.item-carrinho:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-item-carrinho { flex-grow: 1; }
+
+.nome-quantidade-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.quantidade-item {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    min-width: 24px;
+}
+
+.nome-item {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--preto);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.opcional-carrinho {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--cinza-escuro);
+    margin-left: 32px;
+    margin-bottom: 2px;
+}
+
+.subtotal-item {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+    margin-top: 4px;
+    margin-left: 32px;
+}
+
+.botao-remover-item {
+    background: #ffeded;
+    color: #cc0000;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.carrinho-vazio {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+
+/* ── CUPOM ───────────────────────────────────────────────── */
+.opcoes-carrinho { margin-bottom: 12px; }
+
+.grupo-cupom {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+.campo-cupom {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+    height: 45px;
+    border: 1px solid var(--cinza-medio);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    background: var(--branco);
+    color: var(--preto);
+    margin: 0;
+}
+
+.botao-aplicar-cupom {
+    flex: 0 0 auto;
+    height: 45px;
+    padding: 0 20px;
+    background: var(--marrom-cafe);
+    color: var(--branco);
+    border: none;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+
+/* ── ENTREGA ─────────────────────────────────────────────── */
+.grupo-entrega {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    padding: 14px;
+}
+
+.titulo-entrega {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin: 0 0 12px;
+}
+
+.opcoes-entrega {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.opcao-entrega {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border: 2px solid var(--cinza-medio);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 900;
+    background: var(--branco);
+    text-transform: uppercase;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.opcao-entrega.selecionada {
+    border-color: var(--marrom-cafe);
+    background: var(--bege-claro);
+}
+
+.opcao-entrega input[type="radio"] { display: none; }
+
+.informacao-taxa {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--cinza-escuro);
+    text-align: center;
+    padding: 8px 10px;
+    border: 1px dashed var(--cinza-medio);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.campo-input-carrinho {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+    height: 45px;
+    border: 1px solid var(--cinza-medio);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: var(--branco);
+}
+
+
+/* ── RESUMO DO PEDIDO ────────────────────────────────────── */
+.resumo-pedido {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.resumo-pedido-header {
+    background: var(--marrom-cafe);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--cinza-medio);
+}
+
+.resumo-pedido-header span {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--branco);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resumo-pedido-body { padding: 14px; }
+
+.resumo-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    color: var(--cinza-escuro);
+    margin-bottom: 8px;
+}
+
+.resumo-linha.desconto { color: var(--red); font-weight: 700; }
+
+.resumo-divisor {
+    border: none;
+    border-top: 1px dashed var(--cinza-medio);
+    margin: 10px 0;
+}
+
+.resumo-total-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resumo-total-label {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.resumo-total-valor {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+}
+
+/* Botões de ação */
+.botoes-carrinho {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.botoes-carrinho .botao-acao {
+    flex: 1;
+}
+
+
+/* ── PAGAMENTO — PIX ─────────────────────────────────────── */
+.opcao-conteudo {
+    display: none;
+    margin-top: 14px;
+    padding: 16px;
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    animation: fadeInSuave 0.3s ease;
+}
+
+.opcao-pagamento.ativa .opcao-conteudo { display: block; }
+
+.pix-valor {
+    background: var(--bege-claro);
+    border: 1px solid var(--verde-militar);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 900;
+    color: var(--verde-militar);
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+}
+
+.pix-qrcode {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.pix-qrcode img {
+    width: 180px;
+    height: 180px;
+    border: 2px solid var(--marrom-cafe);
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--branco);
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.pix-chave {
+    border: 2px dashed var(--verde-militar);
+    background: var(--bege-claro);
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pix-chave span {
+    font-family: monospace;
+    font-size: 1rem;
+    color: var(--verde-militar);
+    font-weight: 900;
+    word-break: break-all;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+.campo-troco label,
+.info-cartao label {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.input-troco {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--cinza-medio);
+    border-radius: 10px;
+    outline: none;
+    font-size: 1rem;
+    background: var(--branco);
+}
+
+.tag-esgotado {
+    background: #ffcccc;
+    color: #cc0000;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 900;
+}
+
+.btn-adicionar {
+    background: var(--verde-militar);
+    color: var(--branco);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-adicionar:hover {
+    background: #3a5a24;
+    transform: scale(1.1);
+}
+
+
+/* ── NOTIFICAÇÕES FLUTUANTES ─────────────────────────────── */
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0);    opacity: 1; }
+    to   { transform: translateX(100%); opacity: 0; }
+}
+
+.notificacao-flutuante {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+    font-weight: 800;
+    font-size: 0.88rem;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    color: var(--branco);
+    background: var(--verde-sucesso, #4caf50);
+}
+
+.notificacao-flutuante.ativo    { transform: translateX(0); opacity: 1; }
+.notificacao-flutuante.notificacao-success { background: var(--verde-sucesso, #4caf50); }
+.notificacao-flutuante.notificacao-error   { background: #d32f2f; }
+.notificacao-flutuante.notificacao-aviso   { background: var(--marrom-cafe); }
+.notificacao-flutuante.notificacao-info    { background: var(--verde-sucesso, #4caf50); }
+
+
+/* ── ANIMAÇÕES ───────────────────────────────────────────── */
+@keyframes fadeInSuave {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ── DESKTOP ─────────────────────────────────────────────── */
+@media (min-width: 769px) {
+    .opcoes-pagamento {
+        max-width: 450px;
+        margin: 0 auto 25px;
+    }
+    .titulo-carrinho   { font-size: 1.2rem; }
+    .resumo-total-valor { font-size: 1.6rem; }
+}
+
+
+/* ── NOTA HTML: TEXTO DO BOTÃO ───────────────────────────── */
+/*
+   No HTML do modal-carrinho, o botão de avançar deve ter o texto:
+   "PROSSEGUIR"  (substituindo qualquer variante de "Pagar")
+
+   Exemplo:
+   <button class="botao-acao botao-primario" onclick="abrirModalDadosCliente()">
+       Prosseguir
+   </button>
+*/

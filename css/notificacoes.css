@@ -1,0 +1,78 @@
+/* ============================================================
+   NOTIFICAÇÕES E BADGES
+   ============================================================ */
+
+/* MOBILE (Padrão) */
+
+/* Alerta flutuante no topo (Vindo do style.css antigo) */
+.notificacao {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--verde-sucesso);
+    color: var(--branco);
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease-out forwards;
+    max-width: calc(100% - 40px);
+    font-weight: 600;
+    border-left: 5px solid var(--verde-militar);
+}
+
+.notificacao i {
+    font-size: 1.2rem;
+}
+
+/* Badge de quantidade nos cards (CORRIGIDO) */
+.badge-quantidade {
+    /* --- POSICIONAMENTO (O que faltava) --- */
+    position: absolute;  /* Tira do fluxo para não empurrar a foto */
+    top: 10px;           /* Cola no topo */
+    right: 10px;         /* Cola na direita */
+    z-index: 10;         /* Garante que fique acima da foto */
+    
+    /* --- ESTILO VISUAL (Mantido do seu original) --- */
+    background: var(--verde-militar);
+    color: var(--branco);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+    border: 2px solid var(--branco);
+    animation: badgeAppear 0.3s ease-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra extra para destacar */
+}
+
+/* Aviso interno no modal (Seu código original) */
+#status-adicionado-produto {
+    text-align: center;
+    background: var(--verde-notif-bg);
+    color: var(--verde-notif-texto);
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: none;
+}
+
+/* DESKTOP (PC) */
+@media (min-width: 769px) {
+    .badge-quantidade {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .notificacao {
+        max-width: 350px;
+    }
+}

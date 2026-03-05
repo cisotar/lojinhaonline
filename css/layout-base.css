@@ -1,0 +1,250 @@
+/* ============================================================
+   LAYOUT BASE, CABEÇALHO, RODAPÉ E BARRA DO CARRINHO
+   ============================================================ */
+
+/* CABEÇALHO PRINCIPAL */
+.cabecalho-principal {
+    background: var(--verde-escuro1);
+    padding: 15px 20px;
+    color: var(--branco);
+    position: relative;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px var(--sombra-suave);
+}
+
+.cabecalho-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    flex-direction: row !important;
+}
+
+.logo-cabecalho {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.cabecalho-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+.titulo-cabecalho {
+    margin: 0;
+    font-size: 1.6rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 900;
+    line-height: 1.2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.contatos-cabecalho {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 5px;
+}
+
+.link-contato {
+    color: var(--branco);
+    text-decoration: none;
+    font-size: 1rem;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.3s;
+}
+
+.link-contato:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* BOTÃO FECHAR MODAL */
+.botao-fechar-modal {
+    position: absolute;
+    top: 15px;
+    right: 30px;
+    left: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--verde-militar);
+    color: var(--bege-claro);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1010;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.botao-fechar-modal:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+/* BARRA DO CARRINHO FIXA NO RODAPÉ DA TELA */
+.barra-carrinho-fixa {
+    display: none; 
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    background-color: var(--verde-militar) !important;
+    color: var(--bege-claro) !important;
+    padding: 12px 20px !important;
+    z-index: 9999 !important;
+    cursor: pointer;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box !important;
+}
+
+.barra-carrinho-fixa[style*="display: block"],
+.barra-carrinho-fixa[style*="display: flex"] {
+    display: flex !important;
+}
+
+.barra-carrinho-fixa:hover {
+    background-color: var(--verde-militar) !important;
+    transform: translateY(-2px);
+}
+
+.barra-esquerda {
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.quantidade-carrinho {
+    font-size: 0.75rem;
+    color: var(--branco);
+    opacity: 0.9;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.valor-carrinho {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--bege-claro) !important;
+}
+
+.barra-direita {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 900;
+    font-size: 0.9rem;
+    color: var(--branco);
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+.barra-direita i {
+    font-size: 1.2rem;
+    color: var(--bege-claro);
+}
+
+/* BANNER FORNADA */
+.banner-fornada {
+    background-color: var(--branco);
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin: 15px 10px 0;
+    border: 1px solid var(--borda-nav);
+    text-align: center;
+    box-shadow: 0 4px 12px var(--sombra-suave);
+    cursor: pointer;
+}
+
+.fornada-titulo {
+    font-size: 1rem !important;
+    font-weight: 900;
+    margin: 0 0 2px 0 !important;
+}
+
+.fornada-subtitulo {
+    font-size: 0.8rem !important;
+    font-weight: 700;
+    margin: 0 !important;
+}
+
+/* RODAPÉ */
+    .rodape {
+        background-color: var(--verde-escuro1);
+        color: var(--branco);
+        padding: 200px 0; /* Diminuído de 20px para 10px (topo e laterais) */
+        text-align: center;
+        margin-top: 50px; /* Opcional: diminui a distância entre o conteúdo e o rodapé */
+        width: 100%;
+        padding-bottom: 30px !important; /* Diminuído de 100px para 70px para a barra do carrinho */
+    }
+
+    /* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-creme); }
+::-webkit-scrollbar-thumb { background: var(--verde-militar); border-radius: 4px; }
+
+/* RESPONSIVIDADE */
+@media (max-width: 480px) {
+    .botao-fechar-modal {
+        top: 10px;
+        right: 30px;
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+
+    .barra-carrinho-fixa {
+        padding: 10px 15px !important;
+    }
+    
+    .valor-carrinho {
+        font-size: 1.1rem;
+    }
+
+    .rodape {
+        padding-bottom: 120px !important;
+    }
+}
+
+/* Estilo padronizado para campos de entrada no modal do carrinho */
+.campo-input-carrinho {
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 45px !important;
+    border: 1px solid var(--cinza-input) !important;
+    border-radius: 8px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo-input-carrinho:focus {
+    border-color: var(--marrom-cafe) !important;
+}

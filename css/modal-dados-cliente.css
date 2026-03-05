@@ -1,0 +1,142 @@
+/* ============================================================
+   MODAL: DADOS DO CLIENTE - AJUSTE DE ENCAIXE E BORDA
+   ============================================================ */
+
+/* CABEÇALHO — herda as regras globais de .cabecalho-modal do modal-carrinho.css.
+   Regras específicas abaixo só se necessário sobrescrever algo. */
+
+/* 1. MODAL BASE — usa o padrão do overlay-modal.css com background creme */
+#modal-dados-cliente.modal {
+    background: #f4f1ea !important;
+}
+
+/* 2. CORPO ROLÁVEL */
+#modal-dados-cliente .conteudo-modal {
+    background: #f4f1ea !important;
+    padding: 16px 16px 30px !important;
+}
+
+/* 3. TITULO — movido para .cabecalho-modal em overlay-modal.css */
+
+/* 4. CONTAINERS DE GRUPO */
+.formulario-dados > .grupo-campo,
+#secao-endereco {
+    background: var(--branco);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--cinza-medio);
+    margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 5. CAMPOS E ROTULOS */
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 0;
+}
+
+/* Espaço entre grupos: mais em cima, menos embaixo (label fica colado no campo) */
+.formulario-dados > .grupo-campo,
+#secao-endereco .grupo-campo,
+.grupo-duplo .grupo-campo {
+    margin-top: 12px;
+}
+
+.rotulo-campo {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+    margin-top: 0;
+}
+
+.campo-entrada {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--borda-nav);
+    font-size: 0.95rem;
+    background: var(--branco);
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* 6. CARD DE FRETE */
+.card-frete-calculado {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    border-left: 4px solid var(--verde-militar);
+}
+
+.card-frete-icone {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--verde-militar);
+    color: var(--branco);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.card-frete-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-frete-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.card-frete-valor {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+}
+
+/* 7. BOTOES */
+#modal-dados-cliente .botoes-acao {
+    margin-top: 20px;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+#modal-dados-cliente .botoes-acao .botao-acao {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 14px 0 !important;
+}
+
+/* 8. BOTAO FECHAR — gerenciado pelo .cabecalho-modal em overlay-modal.css */
+
+/* ── NOTA HTML: TEXTO DO BOTÃO ───────────────────────────── */
+/*
+   No HTML do modal-dados-cliente, o botão de avançar deve ter o texto:
+   "CONTINUAR"  (substituindo qualquer variante de "Pagar")
+
+   Exemplo:
+   <button class="botao-acao botao-primario" onclick="abrirModalPagamento()">
+       Continuar
+   </button>
+*/

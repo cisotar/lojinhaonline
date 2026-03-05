@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MT57NGKSM8"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MT57NGKSM8');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pão do Ciso - Cardápio Digital</title>
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/01.default/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Favicon de teste -->
+    <link rel="icon" type="image/png" href="img/logo-paodociso.png">
+        
+    <!-- Meta Tags para SEO e Redes Sociais -->
+    <meta name="description" content="Pães artesanais de fermentação natural, antepastos e produtos selecionados. Faça seu pedido para a próxima fornada do Pão do Ciso.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://paodociso.github.io/lojinha/">
+    <meta property="og:title" content="Pão do Ciso | Pães Artesanais">
+    <meta property="og:description" content="Pães de fermentação natural e antepastos artesanais. Faça seu pedido para a próxima fornada!">
+    <meta property="og:image" content="https://paodociso.github.io/lojinha/img/logo1200x630.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://paodociso.github.io/lojinha/">
+    <meta property="twitter:title" content="Pão do Ciso | Pães Artesanais">
+    <meta property="twitter:description" content="Pães de fermentação natural e antepastos artesanais.">
+    <meta property="twitter:image" content="https://paodociso.github.io/lojinha/img/logo1200x630.png">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2d3a27">
+
+    <!-- OneSignal Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "a6e252da-0dc0-494d-baa6-a79812543154",
+                notifyButton: { enable: false },
+                allowLocalhostAsSecureOrigin: true,
+            });
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Usando './' para garantir que ele busque na pasta do projeto no GitHub Pages
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+                    .catch(err => console.error('Falha ao registrar Service Worker:', err));
+            });
+        }
+    </script>
+
+
+</head>
+<body>
+
+    <!-- ===================== BANNER DE INSTALAÇÃO PWA ===================== -->
+    <div id="banner-instalar-app" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
+         background:#2d3a27; color:#fdf5e6; padding:14px 20px;
+         box-shadow:0 -4px 20px rgba(0,0,0,0.3); align-items:center; gap:12px;">
+        <img src="img/logo192x192.png" alt="Pao do Ciso" style="width:44px; height:44px; border-radius:10px; flex-shrink:0;">
+        <div style="flex:1; min-width:0;">
+            <div style="font-weight:bold; font-size:0.95rem;">Instalar Pao do Ciso</div>
+            <div id="banner-instalar-subtexto" style="font-size:0.78rem; opacity:0.8; margin-top:2px;"></div>
+        </div>
+        <button id="btn-instalar-app" style="background:#fdf5e6; color:#2d3a27; border:none; border-radius:8px;
+                padding:8px 16px; font-weight:bold; cursor:pointer; font-size:0.9rem; flex-shrink:0; display:none;">
+            Instalar
+        </button>
+        <button onclick="document.getElementById('banner-instalar-app').style.display='none'; localStorage.setItem('pwa-banner-dispensado','1');"
+                style="background:none; border:none; color:#fdf5e6; opacity:0.6; cursor:pointer; font-size:1.2rem; padding:4px; flex-shrink:0;">
+            x
+        </button>
+    </div>
+
+
+    <!-- ===================== BANNER DE NOTIFICAÇÕES ===================== -->
+    <div id="banner-notificacoes" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9998;
+         background:#4a5d42; color:#fdf5e6; padding:14px 20px;
+         box-shadow:0 -4px 20px rgba(0,0,0,0.3); align-items:center; gap:12px;">
+        <img src="img/logo192x192.png" alt="Pao do Ciso" style="width:44px; height:44px; border-radius:10px; flex-shrink:0;">
+        <div style="flex:1; min-width:0;">
+            <div style="font-weight:bold; font-size:0.95rem;">🔔 Ativar notificações</div>
+            <div style="font-size:0.78rem; opacity:0.8; margin-top:2px;">Avise-me quando houver nova fornada disponível.</div>
+        </div>
+        <button id="btn-ativar-notificacoes" style="background:#fdf5e6; color:#2d3a27; border:none; border-radius:8px;
+                padding:8px 16px; font-weight:bold; cursor:pointer; font-size:0.9rem; flex-shrink:0;">
+            Ativar
+        </button>
+        <button onclick="document.getElementById('banner-notificacoes').style.display='none'; localStorage.setItem('notif-banner-dispensado','1');"
+                style="background:none; border:none; color:#fdf5e6; opacity:0.6; cursor:pointer; font-size:1.2rem; padding:4px; flex-shrink:0;">
+            x
+        </button>
+    </div>
+
+    <!-- ===================== CABECALHO PRINCIPAL ===================== -->
+    <header class="cabecalho-principal">
+        <div class="cabecalho-container">
+            
+        <img src="img/logo-paodociso.png" alt="Pão do Ciso" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.2);">
+            
+            <div class="cabecalho-info">
+                <h1 class="titulo-cabecalho">Pão do Ciso</h1>
+                
+                <div class="contatos-cabecalho">
+                    <a href="https://instagram.com/paodociso" target="_blank" class="link-contato">
+                        <i class="fab fa-instagram"></i> @paodociso
+                    </a>
+                    <a id="link-whatsapp-contato" href="#" target="_blank" class="link-contato">
+                        <i class="fab fa-whatsapp"></i> <span id="texto-whatsapp-contato"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== BANNER DE FORNADA ===================== -->
+    <div class="container">
+        <div class="banner-fornada" onclick="abrirModal('modal-informacoes-fornada')">
+            <div class="fornada-conteudo">
+                <h2 id="texto-data-fornada" class="fornada-titulo">
+                    <i class="fas fa-calendar-alt"></i> PRÓXIMA FORNADA: CARREGANDO...
+                </h2>
+                <p id="texto-limite-pedido" class="fornada-subtitulo">
+                    Pedidos até: carregando...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== ÁREA PRINCIPAL DE PRODUTOS ===================== -->
+    <main id="container-aplicativo" class="container">
+        <!-- Os produtos serão carregados dinamicamente pelo JavaScript -->
+    </main>
+
+    <!-- ===================== BARRA FIXA DO CARRINHO ===================== -->
+    <div id="barra-carrinho" class="barra-carrinho-fixa" onclick="abrirModalCarrinho()">
+        <div class="barra-esquerda">
+            <span class="quantidade-carrinho" id="resumo-quantidade-carrinho">0 itens</span>
+            <span class="valor-carrinho" id="resumo-total-carrinho">R$ 0,00</span>
+        </div>
+        <div class="barra-direita">
+            CARRINHO DE COMPRAS <i class="fas fa-shopping-basket"></i>
+        </div>
+    </div>
+
+    <!-- ===================== OVERLAY PARA MODAIS ===================== -->
+    <div id="overlay-modal" class="overlay-modal" onclick="fecharTodosModais()"></div>
+
+    <!-- ===================== MODAL 7: CONTINUAR COMPRA ===================== -->
+    <div id="modal-recuperar-carrinho" class="modal">
+        <div class="conteudo-modal" style="text-align: center; padding: 30px 25px;">
+            <div style="background: #f0f8f0; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 3px solid var(--verde-militar);">
+                <i class="fas fa-shopping-basket" style="font-size: 2.5rem; color: var(--verde-militar);"></i>
+            </div>
+            
+            <h3 class="titulo-modal" style="color: var(--marrom-cafe); margin-bottom: 15px;">
+                CONTINUAR COMPRA ANTERIOR?
+            </h3>
+            
+            <div class="texto-modal" style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee;">
+                <p style="font-size: 1.1rem; margin-bottom: 10px;">
+                    <i class="fas fa-exclamation-circle" style="color: var(--verde-militar); margin-right: 8px;"></i>
+                    <strong style="color: var(--verde-militar);" id="quantidade-itens-recuperados">0</strong> 
+                    <span style="color: var(--cinza-escuro);">itens no seu carrinho</span>
+                </p>
+                <p style="color: var(--cinza-escuro); font-size: 0.9rem; line-height: 1.4;">
+                    O que você quer fazer com esses itens?
+                </p>
+            </div>
+            
+            <div class="botoes-recuperacao">
+                <button id="botao-manter-carrinho" 
+                        class="botao-acao"  
+                        style="background: var(--verde-militar); color: white; border: none; padding: 16px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;"
+                        onclick="fecharModal('modal-recuperar-carrinho'); mostrarNotificacao('Carrinho mantido! Continue sua compra.');">
+                    <i class="fas fa-check-circle"></i> 
+                    <span>MANTER ITENS<br><small style="font-size: 0.7rem; opacity: 0.9;">(Continuar comprando)</small></span>
+                </button>
+                
+                <button id="botao-limpar-carrinho" 
+                        class="botao-acao"
+                        style="background: #f8f8f8; color: var(--cinza-escuro); border: 2px solid #ddd; padding: 16px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;"
+                        onclick="limparCarrinhoRecuperado()">
+                    <i class="fas fa-trash-alt"></i> 
+                    <span>LIMPAR TUDO<br><small style="font-size: 0.7rem; opacity: 0.9;">(Começar do zero)</small></span>
+                </button>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: #888; margin-top: 25px; line-height: 1.4;">
+                <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                Você pode remover itens um por um depois, se preferir.
+            </p>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL 1: INFORMAÇÕES DA FORNADA ===================== -->
+    <div id="modal-informacoes-fornada" class="modal">
+        <button class="botao-fechar-modal" onclick="fecharModal('modal-informacoes-fornada')">&times;</button>
+        
+        <div class="conteudo-modal-fornada">
+            <div class="topo-informacao-fornada" style="text-align: center; margin-bottom: 15px;">
+                <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--verde-militar);"></i>
+            </div>
+
+            <h3 class="titulo-modal" style="text-align: center; margin-bottom: 20px; color: var(--marrom-cafe);">Informações Importantes</h3>
+
+            <div class="destaque-fornada">
+                <div class="bloco-data">
+                    <span class="label-fornada">PRÓXIMA FORNADA</span>
+                    <span id="data-fornada-info" class="valor-fornada">Carregando...</span>
+                </div>
+                
+                <div class="bloco-data">
+                    <span class="label-fornada">PRAZO LIMITE</span>
+                    <span id="limite-fornada-info" class="valor-fornada">Carregando...</span>
+                </div>
+            </div>
+
+            <div class="lista-dicas-fornada">
+                <div class="dica-fornada">
+                    <i class="fa-solid fa-hands"></i>
+                    <p><strong>Produção Artesanal:</strong> Nossos pães são feitos com fermentação natural (Levain).</p>
+                </div>
+                
+                <div class="dica-fornada">
+                    <i class="fa-solid fa-seedling"></i>
+                    <p><strong>Frescor Garantido:</strong> Tudo é assado na manhã do dia da entrega.</p>
+                </div>
+                
+                <div class="dica-fornada">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Pedidos Limitados:</strong> Trabalhamos sob demanda com capacidade controlada.</p>
+                </div>
+            </div>
+
+            <button class="botao-acao botao-verde-militar" onclick="fecharModal('modal-informacoes-fornada')">
+                ENTENDI
+            </button>
+        </div>
+    </div>   
+
+    <!-- ===================== MODAL 2: DETALHES DO PRODUTO ===================== -->
+        <div id="modal-produto" class="modal">
+
+        <!-- ZONA FIXA: nome + botão fechar (injetados pelo JS em produto-modal.js) -->
+        <div id="cabecalho-modal-produto" class="cabecalho-modal-produto">
+            <!-- Imagem, nome e descrição serão injetados aqui pelo produto-modal.js -->
+        </div>
+
+        <!-- ZONA ROLÁVEL: opcionais, quantidade, subtotal (injetados pelo JS) -->
+        <div id="corpo-modal-produto" class="corpo-modal-produto-scroll">
+            <!-- Opcionais e controles serão injetados aqui pelo produto-modal.js -->
+        </div>
+        
+        <div class="botoes-modal-produto">
+            <!-- Subtotal preso acima dos botões (injetado pelo JS) -->
+            <div id="rodape-subtotal-produto"></div>
+
+            <!-- Botões lado a lado -->
+            <div class="par-botoes">
+                <button id="botao-adicionar-simples" 
+                        class="botao-acao botao-bege" 
+                        onclick="adicionarItemAoCarrinho()">
+                    <i class="fas fa-plus"></i> MAIS ITENS
+                </button>
+                <button id="botao-adicionar-e-ir-para-carrinho" 
+                        class="botao-acao botao-verde botao-avancar" 
+                        onclick="adicionarEIrParaCarrinho()" 
+                        style="display: none;">
+                    <i class="fas fa-shopping-basket"></i> VER CARRINHO
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===================== MODAL 3: CARRINHO DE COMPRAS ===================== -->
+    <div id="modal-carrinho" class="modal">
+
+        <div class="cabecalho-modal">
+            <span class="titulo-cabecalho-modal">Carrinho de Compras</span>
+            <button class="botao-fechar-modal" onclick="fecharModal('modal-carrinho')">&times;</button>
+        </div>
+
+        <div id="conteudo-carrinho" class="conteudo-modal-carrinho">
+            <!-- Conteúdo será injetado dinamicamente pelo JavaScript -->
+        </div>
+    </div>
+
+    <!-- ===================== MODAL 4: DADOS DO CLIENTE ===================== -->
+    <div id="modal-dados-cliente" class="modal">
+
+        <div class="cabecalho-modal">
+            <span class="titulo-cabecalho-modal">Seus Dados</span>
+            <button class="botao-fechar-modal" onclick="fecharModal('modal-dados-cliente')">&times;</button>
+        </div>
+
+        <div class="conteudo-modal">
+                    
+                    <div class="formulario-dados">
+                        <div class="grupo-campo">
+                            <label for="nome-cliente" class="rotulo-campo obrigatorio">
+                                NOME COMPLETO
+                            </label>
+                            <input type="text" 
+                                id="nome-cliente" 
+                                class="campo-entrada"
+                                placeholder="Como podemos te chamar?"
+                                autocomplete="name">
+                        </div>
+                        
+                        <div class="grupo-campo">
+                            <label for="whatsapp-cliente" class="rotulo-campo obrigatorio">
+                                WHATSAPP
+                            </label>
+                            <input type="tel" 
+                                id="whatsapp-cliente" 
+                                class="campo-entrada"
+                                placeholder="(11) 98765-4321"
+                                autocomplete="tel">
+                        </div>
+                        
+                        <div id="secao-endereco" style="display: none;">
+                            <div class="separador-endereco"></div>
+                            
+                            <h4 class="subtitulo-endereco">
+                                <i class="fas fa-map-marker-alt"></i> ENDEREÇO DE ENTREGA
+                            </h4>
+                            
+                            <div class="grupo-campo">
+                                <label for="codigo-postal-cliente" class="rotulo-campo obrigatorio">
+                                    CEP
+                                </label>
+                                <input type="text" 
+                                    id="codigo-postal-cliente" 
+                                    class="campo-entrada"
+                                    placeholder="00000-000"
+                                    maxlength="9"
+                                    oninput="formatarCodigoPostal(this)">
+                                <small class="texto-ajuda">Digite 8 números para buscar automaticamente</small>
+                            </div>
+                            
+                            <div class="grupo-campo">
+                                <label for="logradouro-cliente" class="rotulo-campo obrigatorio">
+                                    RUA
+                                </label>
+                                <input type="text" 
+                                    id="logradouro-cliente" 
+                                    class="campo-entrada campo-leitura"
+                                    placeholder="Será preenchido automaticamente">
+                            </div>
+                            
+                            <div class="grupo-duplo">
+                                <div class="grupo-campo">
+                                    <label for="bairro-cliente" class="rotulo-campo obrigatorio">
+                                        BAIRRO
+                                    </label>
+                                    <input type="text" 
+                                        id="bairro-cliente" 
+                                        class="campo-entrada campo-leitura"
+                                        placeholder="Será preenchido automaticamente">
+                                </div>
+                                
+                                <div class="grupo-campo">
+                                    <label for="cidade-cliente" class="rotulo-campo obrigatorio">
+                                        CIDADE
+                                    </label>
+                                    <input type="text" 
+                                        id="cidade-cliente" 
+                                        class="campo-entrada campo-leitura"
+                                        placeholder="Será preenchido automaticamente">
+                                </div>
+                            </div>
+
+                            <div class="grupo-duplo">
+                                <div class="grupo-campo">
+                                    <label for="numero-residencia-cliente" class="rotulo-campo obrigatorio">
+                                        NÚMERO
+                                    </label>
+                                    <input type="text" 
+                                        id="numero-residencia-cliente" 
+                                        class="campo-entrada"
+                                        placeholder="123"
+                                        autocomplete="address-line2">
+                                </div>
+                                
+                                <div class="grupo-campo">
+                                    <label for="estado-cliente" class="rotulo-campo">
+                                        ESTADO
+                                    </label>
+                                    <input type="text" 
+                                        id="estado-cliente" 
+                                        class="campo-entrada campo-leitura"
+                                        placeholder="UF"
+                                        maxlength="2">
+                                </div>
+                            </div>
+                            
+                            <div class="grupo-campo">
+                                <label for="complemento-residencia-cliente" class="rotulo-campo">
+                                    COMPLEMENTO
+                                </label>
+                                <input type="text" 
+                                    id="complemento-residencia-cliente" 
+                                    class="campo-entrada"
+                                    placeholder="Apto 45, Bloco B"
+                                    autocomplete="address-line3">
+                            </div>
+                            
+                            <div class="grupo-campo">
+                                <label for="ponto-referencia-entrega" class="rotulo-campo">
+                                    PONTO DE REFERÊNCIA
+                                </label>
+                                <input type="text" 
+                                    id="ponto-referencia-entrega" 
+                                    class="campo-entrada"
+                                    placeholder="Ex: Próximo ao mercado, portão azul">
+                            </div>
+                            
+                            <div id="informacao-frete" class="card-frete-calculado" style="display: none;">
+                                <div class="card-frete-icone">
+                                    <i class="fas fa-motorcycle"></i>
+                                </div>
+                                <div class="card-frete-info">
+                                    <span class="card-frete-label">Taxa de entrega</span>
+                                    <span id="valor-frete" class="card-frete-valor">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="par-botoes">
+                        <button class="botao-acao botao-bege"
+                                onclick="fecharModal('modal-dados-cliente'); abrirModal('modal-carrinho');">
+                            <i class="fas fa-arrow-left"></i> VOLTAR
+                        </button>
+
+                        <button id="botao-prosseguir-pagamento" 
+                                class="botao-acao botao-verde-militar"
+                                onclick="validarDadosCliente()">
+                            CONTINUAR <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                </div> 
+        </div>
+
+    <!-- ===================== MODAL 5: FORMA DE PAGAMENTO ===================== -->
+    <div id="modal-pagamento" class="modal">
+
+        <div class="cabecalho-modal">
+            <span class="titulo-cabecalho-modal">Forma de Pagamento</span>
+            <button class="botao-fechar-modal" onclick="fecharTodosModais()">&times;</button>
+        </div>
+
+        <div class="conteudo-modal" style="padding: 20px;">
+            
+            <!-- Resumo do Pedido -->
+            <div id="resumo-final-pedido-pagamento"></div>
+            
+            <!-- Opções de Pagamento -->
+            <div class="opcoes-pagamento">
+                <!-- Opção 1: PIX -->
+                <div class="opcao-pagamento" onclick="selecionarPagamento('PIX', this)">
+                    <span class="opcao-recomendado">RECOMENDADO</span>
+                    
+                    <div class="opcao-cabecalho">
+                        <i class="fa-brands fa-pix"></i>
+                        <span class="opcao-titulo">PIX</span>
+                    </div>
+                    
+                    <div class="opcao-conteudo">
+                        <div class="pix-valor">
+                            VALOR: <span id="valor-pix">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="pix-qrcode">
+                            <img src="img/qrcode-pix.png" alt="QR Code PIX" class="pix-qrcode-img">
+                        </div>
+
+                        <p class="pix-legenda">CLIQUE PARA COPIAR A CHAVE:</p>
+                        
+                        <div class="pix-chave" onclick="copiarChavePix()">
+                            <span id="texto-chave-pix"></span>
+                            <i class="far fa-copy"></i>
+                        </div>
+                        
+                        <div id="mensagem-copiado" class="mensagem-sucesso">
+                            ✅ Chave PIX copiada!
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Opção 2: Cartão -->
+                <div class="opcao-pagamento" onclick="selecionarPagamento('Cartão', this)">
+                    <div class="opcao-cabecalho">
+                        <i class="fas fa-credit-card"></i>
+                        <span class="opcao-titulo">CARTÃO (CRÉDITO/DÉBITO)</span>
+                    </div>
+                    
+                    <div class="opcao-conteudo">
+                        <p class="opcao-descricao">
+                            Pague por aproximação na entrega ou peça o link via WhatsApp.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Opção 3: Dinheiro -->
+                <div class="opcao-pagamento" onclick="selecionarPagamento('Dinheiro', this)">
+                    <div class="opcao-cabecalho">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span class="opcao-titulo">DINHEIRO</span>
+                    </div>
+                    
+                    <div class="opcao-conteudo">
+                        <p class="opcao-descricao">Pagamento em espécie no ato da entrega.</p>
+                        <p class="opcao-observacao">
+                            <i class="fas fa-info-circle"></i> Tenha o troco preparado, por favor.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <!-- Botões conferir se essa div imediatamente abaixo pode ser removida para o css gerir -->
+            <div class="par-botoes">
+                <button class="botao-acao botao-bege"
+                        onclick="fecharModal('modal-pagamento'); abrirModal('modal-dados-cliente');">
+                    <i class="fas fa-arrow-left"></i> VOLTAR
+                </button>
+
+                <button id="botao-finalizar-pedido" 
+                        class="botao-acao botao-verde-militar"
+                        onclick="finalizarPedido()"
+                        disabled>
+                    FINALIZAR <i class="fab fa-whatsapp"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL 6: CONFIRMAÇÃO DE SUCESSO ===================== -->
+    <div id="modal-sucesso" class="modal">
+        <div class="conteudo-modal-sucesso">
+            <div class="icone-sucesso">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h3 class="titulo-sucesso">PEDIDO ENVIADO COM SUCESSO!</h3>
+            
+            <div class="mensagem-sucesso">
+                <p>✅ Seu pedido foi registrado em nosso sistema.</p>
+                <p>📱 O WhatsApp deve abrir em uma nova aba em instantes...</p>
+                <p>💬 Caso não tenha aberto, use o botão abaixo:</p>
+            </div>
+            
+            <div class="detalhes-pedido">
+                <div class="detalhe-item">
+                    <i class="fas fa-receipt"></i>
+                    <span>Nº do Pedido: <strong id="numero-pedido">#0001</strong></span>
+                </div>
+                <div class="detalhe-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Horário: <strong id="horario-pedido">00:00</strong></span>
+                </div>
+            </div>
+            
+            <button id="botao-reenviar-whatsapp" 
+                    class="botao-acao botao-verde-militar" 
+                    onclick="reenviarPedidoWhatsapp()"
+                    style="margin-bottom: 15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                REENVIAR PEDIDO PELO WHATSAPP <i class="fab fa-whatsapp"></i>
+            </button>
+
+            <button id="botao-fechar-sucesso" 
+                    class="botao-acao botao-contorno"
+                    onclick="reiniciarFluxoCompra()"
+                    style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-home"></i> VOLTAR AO CARDÁPIO
+            </button>
+            
+            <p class="texto-agradecimento">
+                Obrigado por escolher o Pão do Ciso! 🥖
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ===================== RODAPÉ ===================== -->
+    <footer class="rodape">
+        <div class="container">
+            <p class="texto-rodape">
+                <i class="fas fa-heart"></i> Feito com carinho por Pão do Ciso
+            </p>
+            <p class="copyright">
+                © 2026 Pão do Ciso - Todos os direitos reservados
+            </p>
+        </div>
+    </footer>
+
+<!-- ===================== SCRIPTS JAVASCRIPT ===================== -->
+<!-- ORDEM CORRETA DE CARREGAMENTO -->
+    <script>
+        // Cria promessa que main.js aguarda antes de inicializar
+        window._firebasePromise = new Promise(resolve => { window._firebaseResolve = resolve; });
+    </script>
+    <script type="module" src="js/firebase.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/config.local.js"></script>
+    <script src="js/dados.js" defer></script>
+    <script src="js/state.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/modais.js" defer></script>
+    <script src="js/notificacoes.js" defer></script>
+    <script src="js/fornada.js" defer></script>
+    <script src="js/cardapio.js" defer></script>
+    <script src="js/opcionais.js" defer></script>
+    <script src="js/produto-modal.js" defer></script>
+    <script src="js/carrinho.js" defer></script>
+    <script src="js/dados-cliente.js" defer></script>
+    <script src="js/cep-frete.js" defer></script>     
+    <script src="js/pagamento.js" defer></script>
+    <script src="js/envio.js" defer></script>
+    <script src="js/address-manager.js" defer></script>
+    <script src="js/recuperacao-carrinho.js" defer></script>
+    <script src="js/main.js" defer></script>
+
+    <!-- ===================== PWA — INSTALAÇÃO + NOTIFICAÇÕES ===================== -->
+    <script>
+        (function() {
+            const jaPWA       = window.matchMedia('(display-mode: standalone)').matches;
+            const isIOS       = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            const isSafari    = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            // --- BANNER DE NOTIFICAÇÕES ---
+            function mostrarBannerNotificacoes() {
+                if (localStorage.getItem('notif-banner-dispensado')) return;
+                if (Notification.permission === 'granted') return;
+                if (isIOS) return; // iOS não suporta push via browser
+
+                const bannerNotif = document.getElementById('banner-notificacoes');
+                const btnAtivar   = document.getElementById('btn-ativar-notificacoes');
+
+                bannerNotif.style.display = 'flex';
+
+                btnAtivar.onclick = async () => {
+                    bannerNotif.style.display = 'none';
+                    localStorage.setItem('notif-banner-dispensado', '1');
+                    if (window.OneSignalDeferred) {
+                        OneSignalDeferred.push(async function(OneSignal) {
+                            await OneSignal.Notifications.requestPermission();
+                        });
+                    }
+                };
+            }
+
+            // --- BANNER DE INSTALAÇÃO ---
+            if (!localStorage.getItem('pwa-banner-dispensado') && !jaPWA) {
+                const banner      = document.getElementById('banner-instalar-app');
+                const subtexto    = document.getElementById('banner-instalar-subtexto');
+                const btnInstalar = document.getElementById('btn-instalar-app');
+                let promptEvento  = null;
+
+                // Android/Desktop
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    promptEvento = e;
+                    subtexto.textContent = 'Adicione o app na tela inicial para pedir mais facilmente.';
+                    btnInstalar.style.display = 'block';
+
+                    btnInstalar.onclick = async () => {
+                        promptEvento.prompt();
+                        const { outcome } = await promptEvento.userChoice;
+                        banner.style.display = 'none';
+                        localStorage.setItem('pwa-banner-dispensado', '1');
+                        // Encadeia: após instalar, pergunta sobre notificações
+                        setTimeout(mostrarBannerNotificacoes, 800);
+                    };
+
+                    // Botão X também encadeia
+                    banner.querySelector('button:last-child').onclick = () => {
+                        banner.style.display = 'none';
+                        localStorage.setItem('pwa-banner-dispensado', '1');
+                        setTimeout(mostrarBannerNotificacoes, 800);
+                    };
+
+                    banner.style.display = 'flex';
+                });
+
+                // iOS Safari
+                if (isIOS && isSafari) {
+                    subtexto.textContent = 'Toque em Compartilhar > "Adicionar à Tela de Início".';
+                    btnInstalar.style.display = 'none';
+
+                    // Botão X no iOS só dispensa — notificações não são suportadas
+                    banner.querySelector('button:last-child').onclick = () => {
+                        banner.style.display = 'none';
+                        localStorage.setItem('pwa-banner-dispensado', '1');
+                    };
+
+                    banner.style.display = 'flex';
+                }
+            } else {
+                // Já instalado ou já dispensou instalação — verifica notificações direto
+                setTimeout(mostrarBannerNotificacoes, 1500);
+            }
+        })();
+    </script>
+
+    </body>
+</html>

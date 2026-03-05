@@ -1,0 +1,95 @@
+/* ============================================
+   ESTILOS GLOBAIS E VARIÁVEIS - PÃO DO CISO
+   Arquivo central que gerencia os módulos
+   ============================================ */
+
+/* ===================== IMPORTAÇÃO DE MÓDULOS ===================== */
+@import url("../layout-base.css");
+@import url("../botoes.css");
+@import url("../cardapio.css");
+@import url("../notificacoes.css");
+@import url("../overlay-modal.css");
+@import url("../modal-produto.css");
+@import url("../modal-carrinho.css");
+@import url("../modal-dados-cliente.css");
+@import url("../modal-pagamento.css");
+@import url("../modal-recuperar-carrinho.css");
+@import url("../modal-informacoes-fornada.css");
+@import url("../modal-sucesso.css");
+
+/* ===================== VARIÁVEIS DE CORES ===================== */
+:root {
+    /* CORES PREFERIDAS */
+    --bg-creme: #fdf5e6;
+    --verde-militar: #2d3a27;
+    --marrom-cafe: #2e2610;
+    --marrom-detalhe: #7d4f39;
+    --verde-escuro1: #332616;
+    --borda-nav: #dccbb0;
+    --texto: #3e2723;
+    --red: #b22222;
+    --branco: #ffffff;
+    --bg-container-modal: #f9f9f9;
+    --verde-escuro: #3a5a24;
+
+    /* CORES COMPLEMENTARES */
+    --bege-escuro: #f5f0e6;
+    --vermelho-alerta: #cc0000;
+    --vermelho-suave: #ffeded;
+    --cinza-claro: #f9f9f9;
+    --cinza-medio: #eeeeee;
+    --cinza-escuro: #4a4a4a;
+    --preto: #111111;
+    --verde-sucesso: #28a745;
+    --azul-info: #17a2b8;
+    --amarelo-alerta: #ffc107;
+    --sombra-suave: rgba(0, 0, 0, 0.1);
+    --sombra-media: rgba(0, 0, 0, 0.15);
+    --bege-claro: #f9f5f0;
+
+    /* NOVAS — cores recorrentes nos módulos, sem variável prévia */
+    --cinza-input: #cccccc;           /* bordas de inputs genéricos       */
+    --cinza-fundo: #f2f2f2;           /* fundo de molduras internas       */
+    --cinza-divisor: #dcdcdc;         /* separadores entre opcionais      */
+    --branco-quase: #fdfdfd;          /* fundo de grupo-campo em formulários */
+    --vermelho-borda: #ffcccc;        /* borda do bloco de subtotal       */
+    --verde-notif-bg: #e8f5e9;        /* fundo de notificação de sucesso  */
+    --verde-notif-texto: #2e7d32;     /* texto de notificação de sucesso  */
+}
+
+/* ===================== RESET E ESTILOS GERAIS ===================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background-color: var(--bege-escuro);
+    color: var(--cinza-escuro);
+    line-height: 1.6;
+    padding-bottom: 80px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* ===================== ANIMAÇÕES GERAIS ===================== */
+/* Apenas animações que não pertencem a um módulo específico */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseFrete {
+    0% { border-color: var(--verde-militar); }
+    50% { border-color: var(--marrom-cafe); }
+    100% { border-color: var(--verde-militar); }
+}

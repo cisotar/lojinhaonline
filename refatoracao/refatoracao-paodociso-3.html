@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refatoração — Pão do Ciso</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde:       #2d3a27;
+    --verde-mid:   #4a6741;
+    --verde-pale:  #e8ede6;
+    --marrom:      #5c3d1e;
+    --marrom-pale: #f5ede3;
+    --bege:        #fdf5e6;
+    --bege-mid:    #f0e6d0;
+    --critico:     #b22222;
+    --critico-bg:  #fdf0f0;
+    --atencao:     #b07000;
+    --atencao-bg:  #fdf7e8;
+    --ok:          #2d6a2d;
+    --ok-bg:       #edf5ed;
+    --ink:         #1a1208;
+    --ink-mid:     #4a3d2e;
+    --ink-pale:    #9e9082;
+    --line:        #ddd5c0;
+    --mono:        'DM Mono', monospace;
+    --sans:        'DM Sans', sans-serif;
+    --serif:       'Fraunces', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bege);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--verde);
+    color: var(--bege);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::after {
+    content: '🍞';
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 140px;
+    opacity: 0.07;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--verde-pale);
+    opacity: 0.7;
+    margin-bottom: 10px;
+  }
+  .header-title {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .header-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--bege-mid);
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--verde-pale);
+    opacity: 0.75;
+    max-width: 500px;
+    margin-top: 6px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--bege-mid);
+    border-bottom: 1px solid var(--line);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    background: rgba(253, 245, 230, 0.92);
+  }
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-pale);
+    white-space: nowrap;
+    min-width: 100px;
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde-mid), var(--verde));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  .progress-count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--verde);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ── */
+  .main-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── SECURITY BOX ── */
+  .security-box {
+    background: var(--critico-bg);
+    border: 1.5px solid var(--critico);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 40px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .security-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .security-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--critico);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .security-text { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+  .security-text code {
+    font-family: var(--mono);
+    background: rgba(178,34,34,0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* ── PHASE BLOCK ── */
+  .phase {
+    margin-bottom: 36px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+  .phase:hover { box-shadow: 0 4px 24px rgba(45,58,39,0.08); }
+  .phase.all-done { border-color: var(--verde-mid); }
+
+  .phase-header {
+    background: var(--verde);
+    color: var(--bege);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .phase-header:hover { background: #3a4c33; }
+  .phase.all-done .phase-header { background: var(--verde-mid); }
+
+  .phase-num {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--bege-mid);
+    opacity: 0.5;
+    line-height: 1;
+    min-width: 36px;
+  }
+  .phase-title-wrap { flex: 1; }
+  .phase-name {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .phase-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .badge-esforco-baixo  { background: rgba(255,255,255,0.15); color: #b8e0b0; }
+  .badge-esforco-medio  { background: rgba(255,200,0,0.2);    color: #ffe08a; }
+  .badge-impacto-alto   { background: rgba(150,230,130,0.2);  color: #b8e0b0; }
+  .badge-impacto-medio  { background: rgba(255,200,0,0.15);   color: #ffe08a; }
+  .badge-risco-baixo    { background: rgba(255,255,255,0.12); color: #c8e6c9; }
+  .badge-risco-medio    { background: rgba(255,180,0,0.2);    color: #ffe08a; }
+  .badge-risco-alto     { background: rgba(255,80,80,0.2);    color: #ffaaaa; }
+  .badge-urgente        { background: rgba(255,80,80,0.25);   color: #ffcccc; }
+
+  .phase-toggle {
+    font-size: 18px;
+    opacity: 0.6;
+    transition: transform 0.3s;
+  }
+  .phase.collapsed .phase-toggle { transform: rotate(-90deg); }
+  .phase-done-check {
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .phase.all-done .phase-done-check { opacity: 1; }
+
+  .phase-body {
+    background: white;
+    border-top: 1px solid var(--line);
+    transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+    overflow: hidden;
+  }
+  .phase.collapsed .phase-body { max-height: 0 !important; opacity: 0; }
+  .phase-body-inner { padding: 20px; }
+
+  .phase-description {
+    font-size: 13.5px;
+    color: var(--ink-mid);
+    line-height: 1.65;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .phase-description code {
+    font-family: var(--mono);
+    background: var(--verde-pale);
+    color: var(--verde);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .phase-description .callout {
+    background: var(--atencao-bg);
+    border-left: 3px solid var(--atencao);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-mid);
+  }
+  .phase-description .callout.danger {
+    background: var(--critico-bg);
+    border-color: var(--critico);
+  }
+
+  /* ── TASKS ── */
+  .tasks-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-pale);
+    margin-bottom: 10px;
+  }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .task:hover { background: var(--bege); }
+  .task.done { background: var(--verde-pale); }
+
+  .task-check {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--line);
+    border-radius: 5px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .task.done .task-check {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: white;
+    font-size: 12px;
+  }
+  .task.done .task-check::after { content: '✓'; }
+
+  .task-text {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.5;
+    flex: 1;
+    transition: color 0.2s;
+  }
+  .task.done .task-text {
+    text-decoration: line-through;
+    color: var(--ink-pale);
+  }
+  .task-text code {
+    font-family: var(--mono);
+    background: var(--verde-pale);
+    color: var(--verde);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .task.done .task-text code {
+    background: transparent;
+    color: inherit;
+  }
+
+  /* ── SECURITY CHECKLIST ── */
+  .security-section {
+    margin-bottom: 36px;
+    border: 1.5px solid var(--critico);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .security-section .phase-header {
+    background: var(--critico);
+  }
+  .security-section .phase-header:hover { background: #9a1a1a; }
+  .security-section.all-done .phase-header { background: var(--ok); }
+
+  /* ── FILE DIAGNOSIS TABLE ── */
+  .files-section {
+    margin-bottom: 36px;
+  }
+  .files-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .files-sub {
+    font-size: 13px;
+    color: var(--ink-pale);
+    margin-bottom: 16px;
+  }
+  .files-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .files-table th {
+    background: var(--verde);
+    color: var(--bege);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 500;
+  }
+  .files-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    color: var(--ink-mid);
+  }
+  .files-table tr:nth-child(even) td { background: var(--bege); }
+  .files-table tr:hover td { background: var(--verde-pale); }
+  .files-table .file-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--verde);
+    white-space: nowrap;
+  }
+  .files-table .file-lines {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-pale);
+    text-align: center;
+  }
+  .status-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  .status-critico { background: var(--critico-bg); color: var(--critico); border: 1px solid rgba(178,34,34,0.25); }
+  .status-atencao  { background: var(--atencao-bg); color: var(--atencao); border: 1px solid rgba(176,112,0,0.25); }
+  .status-ok       { background: var(--ok-bg);      color: var(--ok);      border: 1px solid rgba(45,106,45,0.25); }
+
+  /* ── POSITIVES ── */
+  .positives-section {
+    background: var(--verde-pale);
+    border: 1px solid rgba(74,103,65,0.25);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 36px;
+  }
+  .positives-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--verde);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .positive-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    color: var(--ink-mid);
+    line-height: 1.5;
+  }
+  .positive-icon { flex-shrink: 0; color: var(--verde-mid); }
+  .positive-item strong { color: var(--ink); }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    text-align: center;
+    padding: 32px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-pale);
+    border-top: 1px solid var(--line);
+    letter-spacing: 1px;
+  }
+
+  /* ── CONFETTI animation ── */
+  @keyframes confetti-fall {
+    0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confetti-fall linear forwards;
+    z-index: 9998;
+    pointer-events: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .site-header { padding: 32px 20px; }
+    .progress-wrap { padding: 14px 20px; }
+    .main-wrap { padding: 24px 16px 60px; }
+    .files-table .file-problema { display: none; }
+    .phase-header { padding: 14px 16px; }
+    .phase-body-inner { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-eyebrow">Plano de Refatoração</div>
+  <h1 class="header-title">Pão do Ciso<br><em>Rastreador de Iterações</em></h1>
+  <p class="header-sub">Marque as tarefas conforme forem concluídas. O progresso é salvo automaticamente no seu navegador.</p>
+</header>
+
+<div class="progress-wrap">
+  <span class="progress-label" id="progress-label">0 concluídas</span>
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <span class="progress-count" id="progress-count">0 / 0</span>
+</div>
+
+<div class="main-wrap">
+
+  <!-- SEGURANÇA IMEDIATA -->
+  <div class="phase security-section" id="phase-seg">
+    <div class="phase-header" onclick="togglePhase('phase-seg')">
+      <div class="phase-num">⚠</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Segurança Imediata</div>
+        <div class="phase-meta">
+          <span class="badge badge-urgente">ANTES DE QUALQUER COISA</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          O arquivo <code>config.local.js</code> foi compartilhado contendo o número de WhatsApp real, chave PIX e URL do Google Apps Script. O README afirma que está no <code>.gitignore</code> — mas isso precisa ser verificado.
+          <div class="callout danger">
+            Se o arquivo já entrou no histórico do Git em algum momento, os dados estão expostos mesmo que esteja no .gitignore hoje. Use <code>git log --all -- js/config.local.js</code> para verificar.
+          </div>
+        </div>
+        <div class="tasks-label">Verificações</div>
+        <div class="task" onclick="toggleTask(this)" data-id="seg-1">
+          <div class="task-check"></div>
+          <div class="task-text">Executar <code>git log --all --full-history -- js/config.local.js</code> — confirmar que o arquivo nunca foi commitado</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="seg-2">
+          <div class="task-check"></div>
+          <div class="task-text">Confirmar que <code>js/config.local.js</code> está no <code>.gitignore</code></div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="seg-3">
+          <div class="task-check"></div>
+          <div class="task-text">Se já foi commitado: rodar <code>git filter-repo --path js/config.local.js --invert-paths</code> e fazer force-push</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="seg-4">
+          <div class="task-check"></div>
+          <div class="task-text">Se dados foram expostos: recriar URL do Google Apps Script + considerar troca do número de contato do site</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGNÓSTICO POR ARQUIVO -->
+  <div class="files-section">
+    <div class="files-title">Diagnóstico por Arquivo</div>
+    <div class="files-sub">Visão geral de todos os arquivos analisados e seus problemas identificados</div>
+    <div style="overflow-x:auto; border-radius:10px; border:1px solid var(--line);">
+      <table class="files-table">
+        <thead>
+          <tr>
+            <th>Arquivo</th>
+            <th style="text-align:center">Linhas</th>
+            <th class="file-problema">Problema principal</th>
+            <th style="text-align:center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="file-name">js/carrinho.js</td><td class="file-lines">~380</td><td class="file-problema">5 responsabilidades distintas num único arquivo</td><td style="text-align:center"><span class="status-pill status-critico">Crítico</span></td></tr>
+          <tr><td class="file-name">js/envio.js</td><td class="file-lines">~180</td><td class="file-problema">Cálculo financeiro duplicado — risco real de divergência</td><td style="text-align:center"><span class="status-pill status-critico">Crítico</span></td></tr>
+          <tr><td class="file-name">js/cardapio.js</td><td class="file-lines">~270</td><td class="file-problema">Logs excessivos em atualizarBadgeNoCard() — ~25 chamadas log()</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/address-manager.js</td><td class="file-lines">~240</td><td class="file-problema">Overlap com cep-frete.js na validação de endereço</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/cep-frete.js</td><td class="file-lines">~230</td><td class="file-problema">renderizarCarrinho() chamada dentro de buscarCEP() — acoplamento</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/produto-modal.js</td><td class="file-lines">~160</td><td class="file-problema">gerarHTMLSecaoOpcionais() mistura lógica de negócio com HTML</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/dados-cliente.js</td><td class="file-lines">~120</td><td class="file-problema">120 linhas comentadas (testarAddressManager) e código de diagnóstico</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/fornada.js</td><td class="file-lines">~140</td><td class="file-problema">Lógica de parsing de data duplicada entre duas funções</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/main.js</td><td class="file-lines">~110</td><td class="file-problema">setTimeout(100ms) como workaround de carregamento</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/recuperacao-carrinho.js</td><td class="file-lines">~90</td><td class="file-problema">Lê window.carrinho diretamente — dificulta testes</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">index.html</td><td class="file-lines">~420</td><td class="file-problema">~80 linhas de style="" inline nos banners PWA</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+          <tr><td class="file-name">js/modais.js</td><td class="file-lines">~80</td><td class="file-problema">Side-effects implícitos em abrirModal() não documentados</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">js/utils.js</td><td class="file-lines">~90</td><td class="file-problema">Bem estruturado — modelo a seguir nos outros arquivos</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">js/state.js</td><td class="file-lines">~70</td><td class="file-problema">Sem problemas significativos</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">js/notificacoes.js</td><td class="file-lines">~50</td><td class="file-problema">Fonte única e limpa</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">js/pagamento.js</td><td class="file-lines">~80</td><td class="file-problema">Sem problemas significativos</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">js/opcionais.js</td><td class="file-lines">~50</td><td class="file-problema">Sem problemas significativos</td><td style="text-align:center"><span class="status-pill status-ok">OK</span></td></tr>
+          <tr><td class="file-name">css/ (todos)</td><td class="file-lines">~1800</td><td class="file-problema">.notificacao-flutuante definida em 2 arquivos CSS</td><td style="text-align:center"><span class="status-pill status-atencao">Atenção</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FASE 1 -->
+  <div class="phase" id="phase-1">
+    <div class="phase-header" onclick="togglePhase('phase-1')">
+      <div class="phase-num">1</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Unificar cálculo financeiro</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-medio">Esforço médio</span>
+          <span class="badge badge-impacto-alto">Impacto alto</span>
+          <span class="badge badge-risco-medio">Risco médio</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          O total do pedido é calculado em dois lugares com lógicas distintas: <code>calcularSubtotalProdutos()</code> em <code>carrinho.js</code> e a lógica embutida em <code>gerarMensagemWhatsApp()</code> em <code>envio.js</code>. O total exibido na tela pode divergir do total enviado no WhatsApp.
+          <div class="callout danger">
+            Já existe uma divergência conhecida: em <code>carrinho.js</code> os opcionais NÃO são multiplicados pela quantidade do produto principal. Em <code>envio.js</code> a lógica está correta (há um comentário "CORREÇÃO" no código). O HTML de resumo continua usando a função com bug.
+          </div>
+        </div>
+        <div class="tasks-label">Passos</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f1-1">
+          <div class="task-check"></div>
+          <div class="task-text">Criar <code>calcularTotaisPedido(carrinho, estadoAplicativo)</code> em <code>utils.js</code> retornando <code>{ subtotal, desconto, frete, total }</code></div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f1-2">
+          <div class="task-check"></div>
+          <div class="task-text">Substituir <code>calcularSubtotalProdutos()</code> e o cálculo em <code>atualizarResumoFinanceiroCarrinho()</code> pela nova função unificada</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f1-3">
+          <div class="task-check"></div>
+          <div class="task-text">Substituir o cálculo local em <code>gerarMensagemWhatsApp()</code> em <code>envio.js</code> pela mesma função</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f1-4">
+          <div class="task-check"></div>
+          <div class="task-text">Adicionar testes em <code>financeiro.test.mjs</code>: divergência opcional×quantidade, cupom fixo com entrega, total negativo por desconto alto</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f1-5">
+          <div class="task-check"></div>
+          <div class="task-text">Rodar <code>node --test js/testes/financeiro.test.mjs</code> — todos os 16 testes existentes + novos devem passar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 2 -->
+  <div class="phase" id="phase-2">
+    <div class="phase-header" onclick="togglePhase('phase-2')">
+      <div class="phase-num">2</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Centralizar aliases de exportação</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-baixo">Esforço baixo</span>
+          <span class="badge badge-impacto-alto">Impacto alto</span>
+          <span class="badge badge-risco-baixo">Risco baixo</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          Cada arquivo JS exporta funções de três formas simultâneas — namespace, alias global e declaração implícita. Isso gera ~700 linhas de código repetitivo e torna renomeações arriscadas: é necessário atualizar 3 lugares por arquivo afetado, mais os <code>onclick=""</code> no HTML.
+        </div>
+        <div class="tasks-label">Passos</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f2-1">
+          <div class="task-check"></div>
+          <div class="task-text">Criar <code>js/compat.js</code> com lista explícita de todos os aliases necessários para o HTML (<code>window.X = window.PaoDoCiso.X</code>)</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f2-2">
+          <div class="task-check"></div>
+          <div class="task-text">Em cada módulo JS: remover o bloco de aliases globais (<code>window.X = X</code>), mantendo apenas <code>window.PaoDoCiso.X = X</code></div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f2-3">
+          <div class="task-check"></div>
+          <div class="task-text">Adicionar <code>js/compat.js</code> como último script no <code>index.html</code>, sem <code>defer</code>, após todos os módulos</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f2-4">
+          <div class="task-check"></div>
+          <div class="task-text">Atualizar <code>sw.js</code> para incluir <code>compat.js</code> na lista de assets cacheados</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f2-5">
+          <div class="task-check"></div>
+          <div class="task-text">Verificar manualmente: todos os botões, banners e modais do index.html continuam funcionando</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 3 -->
+  <div class="phase" id="phase-3">
+    <div class="phase-header" onclick="togglePhase('phase-3')">
+      <div class="phase-num">3</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Limpar logs e código de diagnóstico</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-baixo">Esforço baixo</span>
+          <span class="badge badge-impacto-medio">Impacto médio</span>
+          <span class="badge badge-risco-baixo">Risco baixo</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          <code>atualizarBadgeNoCard()</code> em <code>cardapio.js</code> tem ~25 chamadas <code>log()</code> misturadas com lógica de negócio, tornando a função difícil de ler. <code>dados-cliente.js</code> tem 120 linhas comentadas de código de teste.
+        </div>
+        <div class="tasks-label">Passos</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f3-1">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>cardapio.js</code>: condensar logs de <code>atualizarBadgeNoCard()</code> para 3 chamadas essenciais (entrada, ação, resultado) — função de ~60 para ~25 linhas</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f3-2">
+          <div class="task-check"></div>
+          <div class="task-text">Mover <code>diagnosticarBadges()</code> para <code>js/dev-tools.js</code> e remover do <code>sw.js</code> (não cachear ferramentas de debug)</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f3-3">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>dados-cliente.js</code>: remover o bloco comentado de <code>testarAddressManager()</code> (~120 linhas)</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f3-4">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>address-manager.js</code>: remover comentários sobre código removido (<code>// ✅ setInterval removido</code>) que não agregam valor</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f3-5">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>css/modal-carrinho.css</code>: remover a definição duplicada de <code>.notificacao-flutuante</code> (já existe em <code>notificacoes.css</code>)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 4 -->
+  <div class="phase" id="phase-4">
+    <div class="phase-header" onclick="togglePhase('phase-4')">
+      <div class="phase-num">4</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Migrar HTML inline para CSS</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-medio">Esforço médio</span>
+          <span class="badge badge-impacto-medio">Impacto médio</span>
+          <span class="badge badge-risco-baixo">Risco baixo</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          Os banners PWA no <code>index.html</code> têm ~80 linhas com <code>style=""</code> de layout completo. Os geradores de HTML em <code>carrinho.js</code> geram strings com <code>style=""</code> extensos quando já existem classes CSS para esses casos.
+        </div>
+        <div class="tasks-label">4a — Banners PWA no index.html</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-1">
+          <div class="task-check"></div>
+          <div class="task-text">Criar classes <code>.banner-pwa-fixo</code> e <code>.banner-pwa-notif</code> em <code>layout-base.css</code> com os estilos dos banners</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-2">
+          <div class="task-check"></div>
+          <div class="task-text">Substituir ~80 linhas de <code>style=""</code> nos banners pelos atributos de classe correspondentes</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-3">
+          <div class="task-check"></div>
+          <div class="task-text">Mover o <code>&lt;img&gt;</code> do logo no header para usar a classe <code>.logo-cabecalho</code> já definida em <code>layout-base.css</code></div>
+        </div>
+        <div class="tasks-label" style="margin-top:16px">4b — Geradores de HTML em carrinho.js</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-4">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>gerarHTMLResumo()</code>: substituir <code>style=""</code> pelas classes <code>.resumo-carrinho-container</code>, <code>.resumo-linha</code>, <code>.resumo-divisor</code> já em <code>modal-pagamento.css</code></div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-5">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>gerarHTMLOpcoesEntregaCupom()</code>: substituir os <code>style=""</code> inline do botão APLICAR pelas classes existentes</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f4-6">
+          <div class="task-check"></div>
+          <div class="task-text">Em <code>modal-pagamento.css</code>: remover o <code>style=""</code> da div <code>.botoes-acao</code> no index.html (comentário já diz "conferir se pode remover")</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 5 -->
+  <div class="phase" id="phase-5">
+    <div class="phase-header" onclick="togglePhase('phase-5')">
+      <div class="phase-num">5</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Resolver carregamento e acoplamentos</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-baixo">Esforço baixo</span>
+          <span class="badge badge-impacto-medio">Impacto médio</span>
+          <span class="badge badge-risco-baixo">Risco baixo</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">
+          <code>main.js</code> usa <code>setTimeout(100ms)</code> para aguardar <code>dados.js</code> (carregado com <code>defer</code>) — workaround de ordenação. E <code>cep-frete.js</code> chama <code>renderizarCarrinho()</code> dentro de <code>buscarEnderecoPorCodigoPostal()</code> para preservar o campo CEP após re-render, o que acopla dois módulos sem necessidade.
+        </div>
+        <div class="tasks-label">5a — Remover setTimeout de main.js</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f5-1">
+          <div class="task-check"></div>
+          <div class="task-text">Remover o atributo <code>defer</code> de <code>dados.js</code> no <code>index.html</code> (é dados puros, não precisa aguardar o DOM)</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f5-2">
+          <div class="task-check"></div>
+          <div class="task-text">Remover o <code>setTimeout(100ms)</code> e seu comentário de <code>main.js</code> — chamar <code>inicializarSistema()</code> diretamente</div>
+        </div>
+        <div class="tasks-label" style="margin-top:16px">5b — Desacoplar buscarCEP() de renderizarCarrinho()</div>
+        <div class="task" onclick="toggleTask(this)" data-id="f5-3">
+          <div class="task-check"></div>
+          <div class="task-text">Remover a chamada <code>renderizarCarrinho()</code> de dentro de <code>buscarEnderecoPorCodigoPostal()</code> em <code>cep-frete.js</code></div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f5-4">
+          <div class="task-check"></div>
+          <div class="task-text">Verificar que <code>gerarHTMLOpcoesEntregaCupom()</code> já preserva o CEP via <code>estadoAplicativo.cepCalculado</code> — o que elimina a necessidade do re-render</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="f5-5">
+          <div class="task-check"></div>
+          <div class="task-text">Testar fluxo completo: digitar CEP → buscar endereço → alterar modo entrega → CEP deve permanecer no campo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRÓXIMAS ITERAÇÕES -->
+  <div class="phase" id="phase-next">
+    <div class="phase-header" onclick="togglePhase('phase-next')">
+      <div class="phase-num">→</div>
+      <div class="phase-title-wrap">
+        <div class="phase-name">Próximas Iterações</div>
+        <div class="phase-meta">
+          <span class="badge badge-esforco-medio">Além da refatoração imediata</span>
+        </div>
+      </div>
+      <div class="phase-done-check">✅</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-body-inner">
+        <div class="phase-description">Melhorias que não são dívida técnica urgente, mas que aumentariam significativamente qualidade e performance.</div>
+        <div class="tasks-label">Melhorias identificadas</div>
+        <div class="task" onclick="toggleTask(this)" data-id="fn-1">
+          <div class="task-check"></div>
+          <div class="task-text"><strong>Font Awesome → SVG inline:</strong> elimina ~150KB de CSS + fonte, ~1.5s de carregamento bloqueante. Só ~8 ícones são usados no projeto</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="fn-2">
+          <div class="task-check"></div>
+          <div class="task-text"><strong>Ampliar cobertura de testes:</strong> <code>calcularFretePorBairro()</code> e <code>gerarMensagemWhatsApp()</code> têm lógica crítica mas dependem de globais — extrair parâmetros permite testá-las em Node</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="fn-3">
+          <div class="task-check"></div>
+          <div class="task-text"><strong>Painel administrativo — edição de dados da loja:</strong> editar whatsappVendedor, Instagram e nome da loja diretamente pelo painel (já listado no README)</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="fn-4">
+          <div class="task-check"></div>
+          <div class="task-text"><strong>Lazy loading de seções do cardápio:</strong> usar <code>IntersectionObserver</code> para renderizar seções sob demanda — melhora LCP quando houver muitos produtos</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)" data-id="fn-5">
+          <div class="task-check"></div>
+          <div class="task-text"><strong>Bump do CACHE_NAME em sw.js:</strong> garantir processo documentado para atualizar o cache a cada deploy com mudanças de JS/CSS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- O QUE ESTÁ BEM -->
+  <div class="positives-section">
+    <div class="positives-title">✦ O que está bem — preserve e use como modelo</div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>utils.js como fonte única</strong> — formatarCEP(), aplicarMascaraCEP() e validarEnderecoCompleto() têm uma única implementação bem documentada. É o modelo a seguir nos outros arquivos.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>Testes financeiros em Node.js</strong> — 16 testes cobrindo as funções de maior risco. Raro em projetos deste porte e tamanho.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>Service Worker completo</strong> — cache offline bem estruturado com estratégia network-first + fallback. Limpeza de caches antigos correta no activate.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>CSS modularizado por componente</strong> — 13 arquivos com responsabilidades claras. Cada modal tem seu CSS.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>config.DEBUG e window.log()</strong> — sistema de log condicional. Correto e bem implementado.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>Comentários técnicos de qualidade</strong> — o setTimeout em main.js, o "CORREÇÃO" em envio.js, o setInterval em address-manager.js mostram raciocínio documentado.</div></div>
+    <div class="positive-item"><span class="positive-icon">✓</span><div><strong>Namespace window.PaoDoCiso</strong> — a intenção está correta. A Fase 2 apenas consolida o que já está bem encaminhado.</div></div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<footer class="site-footer">
+  PÃO DO CISO — REFATORAÇÃO 2026 &nbsp;·&nbsp; PROGRESSO SALVO LOCALMENTE
+</footer>
+
+<script>
+// ── STORAGE KEY ──────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'paodociso-refatoracao-v1';
+
+// ── LOAD STATE ───────────────────────────────────────────────────────────────
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+let state = loadState();
+
+// Restore tasks
+document.querySelectorAll('.task').forEach(task => {
+  const id = task.dataset.id;
+  if (state[id]) applyDone(task);
+});
+
+// Restore phase collapse state (default: open)
+const PHASE_IDS = ['phase-seg','phase-1','phase-2','phase-3','phase-4','phase-5','phase-next'];
+PHASE_IDS.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (state['phase-collapsed-' + id]) {
+    el.classList.add('collapsed');
+  }
+  // set natural height for animation
+  const body = el.querySelector('.phase-body');
+  if (body && !el.classList.contains('collapsed')) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+});
+
+updateProgress();
+updateAllPhaseDone();
+
+// ── TOGGLE TASK ───────────────────────────────────────────────────────────────
+function toggleTask(task) {
+  const id = task.dataset.id;
+  const wasDone = task.classList.contains('done');
+
+  if (wasDone) {
+    task.classList.remove('done');
+    delete state[id];
+  } else {
+    applyDone(task);
+    state[id] = true;
+  }
+
+  saveState(state);
+  updateProgress();
+  updatePhaseDone(task.closest('.phase'));
+}
+
+function applyDone(task) {
+  task.classList.add('done');
+}
+
+// ── PHASE TOGGLE ──────────────────────────────────────────────────────────────
+function togglePhase(id) {
+  const el = document.getElementById(id);
+  const body = el.querySelector('.phase-body');
+  const isCollapsed = el.classList.contains('collapsed');
+
+  if (isCollapsed) {
+    el.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    delete state['phase-collapsed-' + id];
+  } else {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      body.style.maxHeight = body.scrollHeight + 'px';
+      requestAnimationFrame(() => {
+        el.classList.add('collapsed');
+      });
+    });
+    state['phase-collapsed-' + id] = true;
+  }
+
+  saveState(state);
+}
+
+// ── PROGRESS ─────────────────────────────────────────────────────────────────
+function updateProgress() {
+  const all   = document.querySelectorAll('.task');
+  const done  = document.querySelectorAll('.task.done');
+  const pct   = all.length ? (done.length / all.length) * 100 : 0;
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-count').textContent = done.length + ' / ' + all.length;
+  document.getElementById('progress-label').textContent =
+    done.length === 0   ? '0 concluídas' :
+    done.length === all.length ? '🎉 Tudo concluído!' :
+    done.length + (done.length === 1 ? ' concluída' : ' concluídas');
+
+  if (done.length === all.length && all.length > 0) launchConfetti();
+}
+
+function updatePhaseDone(phase) {
+  if (!phase) return;
+  const tasks = phase.querySelectorAll('.task');
+  const done  = phase.querySelectorAll('.task.done');
+  if (tasks.length > 0 && done.length === tasks.length) {
+    phase.classList.add('all-done');
+  } else {
+    phase.classList.remove('all-done');
+  }
+}
+
+function updateAllPhaseDone() {
+  document.querySelectorAll('.phase').forEach(updatePhaseDone);
+}
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────────
+let confettiFired = false;
+function launchConfetti() {
+  if (confettiFired) return;
+  confettiFired = true;
+  const colors = ['#2d3a27','#5c3d1e','#fdf5e6','#4a6741','#b07000','#f0e6d0'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = '-10px';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      p.style.animationDelay = (Math.random() * 0.5) + 's';
+      p.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+      p.style.width  = (6 + Math.random() * 8) + 'px';
+      p.style.height = (6 + Math.random() * 8) + 'px';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 4000);
+    }, i * 40);
+  }
+  setTimeout(() => { confettiFired = false; }, 5000);
+}
+
+// ── NATURAL MAX-HEIGHT ON RESIZE ──────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.phase:not(.collapsed) .phase-body').forEach(body => {
+    body.style.maxHeight = body.scrollHeight + 'px';
+  });
+});
+</script>
+</body>
+</html>

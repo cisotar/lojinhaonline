@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Frete - Pão do Ciso</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f1ea; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #5d4037; border-bottom: 2px solid #d7ccc8; padding-bottom: 10px; margin-top: 0; }
+        textarea { width: 100%; height: 120px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background: #5d4037; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        th { background: #5d4037; color: white; }
+        .valor-frete { font-weight: bold; color: #2e7d32; }
+        .erro-msg { color: #c62828; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚚 Logística: Bragança Paulista (Busca Exata)</h2>
+    
+    <label>Lista de Bairros (um por linha):</label>
+    <textarea id="lista-bairros" placeholder="Vila Aparecida&#10;Água Comprida"></textarea>
+    <button onclick="processarLote()">Calcular Fretes em Lote</button>
+    
+    <div id="progresso" style="margin: 15px 0; font-weight: bold; color: #795548;"></div>
+
+    <table id="tabela-resultados">
+        <thead>
+            <tr>
+                <th>Entrada</th>
+                <th>Termo Buscado</th>
+                <th>Termo Encontrado</th>
+                <th>Distância</th>
+                <th>Preço do Frete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    const ORIGEM = { lat: -22.9531, lon: -46.5419 };
+
+    function calcularPrecoFrete(kmStr) {
+        const km = parseFloat(kmStr);
+        if (isNaN(km)) return "---";
+        const kmArredondado = Math.ceil(km);
+        const base = kmArredondado * 2 * 0.9;
+        const total = base * 1.5;
+        return "R$ " + total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    async function processarLote() {
+        const linhas = document.getElementById('lista-bairros').value.split('\n').filter(l => l.trim() !== "");
+        const tbody = document.querySelector('#tabela-resultados tbody');
+        const progresso = document.getElementById('progresso');
+        tbody.innerHTML = "";
+
+        for (let entrada of linhas) {
+            let termo = entrada.trim();
+            progresso.innerText = `Processando: ${termo}...`;
+            
+            let nomeOficial = "Não encontrado";
+            let distKm = "---";
+            let erroLog = "";
+
+            // 1. BUSCA DE COORDENADAS (Nominatim)
+            // Usando apenas 'q' e concatenando a cidade para evitar erro 400 de parâmetros mal formados
+            const query = `${termo}, Bragança Paulista, SP, Brasil`;
+            const urlSearch = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+            
+            try {
+                const res = await fetch(urlSearch, {
+                    headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'PaoDoCisoConsultas' }
+                });
+
+                if (!res.ok) throw new Error(`Status: ${res.status}`);
+
+                const dados = await res.json();
+
+                if (dados && dados.length > 0) {
+                    const local = dados[0];
+                    nomeOficial = local.display_name.split(',')[0];
+
+                    // 2. BUSCA DE DISTÂNCIA (OSRM)
+                    const urlRoute = `https://router.project-osrm.org/route/v1/driving/${ORIGEM.lon},${ORIGEM.lat};${local.lon},${local.lat}?overview=false`;
+                    const resRoute = await fetch(urlRoute);
+                    const dataRoute = await resRoute.json();
+                    
+                    if (dataRoute.routes && dataRoute.routes[0]) {
+                        distKm = (dataRoute.routes[0].distance / 1000).toFixed(2);
+                    }
+                }
+            } catch (e) {
+                erroLog = `<br><span class="erro-msg">Erro: API offline ou bloqueio</span>`;
+                console.error(e);
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${entrada}</td>
+                    <td>${termo}</td>
+                    <td>${nomeOficial}${erroLog}</td>
+                    <td>${distKm !== "---" ? distKm + " km" : "---"}</td>
+                    <td class="valor-frete">${calcularPrecoFrete(distKm)}</td>
+                </tr>`;
+            
+            // Pausa obrigatória de 1.5s para evitar bloqueio 403/429
+            await new Promise(r => setTimeout(r, 4000));
+        }
+        progresso.innerText = "Concluído.";
+    }
+</script>
+</body>
+</html>

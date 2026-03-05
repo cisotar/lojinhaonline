@@ -1,0 +1,162 @@
+/* ============================================================
+   OVERLAY E ESTRUTURA BASE DOS MODAIS
+   ============================================================ */
+
+.overlay-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+/* ── MODAL BASE ──────────────────────────────────────────────
+   Centralização com transform (comportamento original correto).
+   
+   A correção está no max-height: descontamos explicitamente
+   o topo (10px de folga) + a barra do carrinho (~60px) + folga.
+   
+   "height: auto" garante que modais com pouco conteúdo
+   não crescem além do necessário — o modal abraça o conteúdo.
+   ────────────────────────────────────────────────────────── */
+.modal {
+    position: fixed;
+    z-index: 1001;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    /* Desloca o centro para cima, compensando a barra do carrinho */
+    transform: translate(-50%, calc(-50% - 35px)) !important;
+
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+
+    /* Altura: abraça o conteúdo mas nunca ultrapassa o espaço útil.
+       100vh - 10px (topo) - 70px (barra carrinho) - 10px (folga) = 100vh - 90px */
+    height: auto !important;
+    max-height: calc(100vh - 90px) !important;
+
+    box-sizing: border-box;
+    margin: 0 !important;
+    background: var(--bg-container-modal);
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    overflow: hidden;
+
+    display: none;
+    flex-direction: column;
+}
+
+/* Quando aberto via JS */
+.modal[style*="display: block"],
+.modal[style*="display:block"],
+.modal[style*="display: flex"],
+.modal[style*="display:flex"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* ── CONTEÚDO INTERNO PADRÃO ─────────────────────────────────
+   Para modais simples (carrinho, dados-cliente, etc.)
+   ────────────────────────────────────────────────────────── */
+.conteudo-modal,
+.conteudo-modal-carrinho {
+    flex: 1 1 auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px !important;
+    max-height: none !important;
+    min-height: 0;
+}
+
+/* conteudo-modal-produto é controlado pelo modal-produto.css */
+
+/* ── CABEÇALHO PADRONIZADO DOS MODAIS ────────────────────────
+   Usado por: modal-dados-cliente, modal-pagamento
+   Título + botão fechar lado a lado, fundo marrom-cafe
+   ────────────────────────────────────────────────────────── */
+.cabecalho-modal {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: var(--verde-escuro1);
+    border-radius: 15px 15px 0 0;
+}
+
+.titulo-cabecalho-modal {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--branco);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex: 1;
+    text-align: center;
+    padding-left: 30px; /* compensa o botão fechar à direita */
+}
+
+.cabecalho-modal .botao-fechar-modal {
+    position: static !important;
+    background: rgba(255,255,255,0.15) !important;
+    color: var(--branco) !important;
+    border: none !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    font-size: 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: none !important;
+    top: auto !important;
+    right: auto !important;
+}
+
+/* ── PAR DE BOTÕES — lado a lado em todos os modais ─────────
+   Mobile e desktop: sempre flex, sempre lado a lado.
+   ────────────────────────────────────────────────────────── */
+.par-botoes {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.par-botoes .botao-acao {
+    flex: 1;
+    margin-top: 0 !important;
+}
+
+
+/* ── PAR DE BOTÕES — lado a lado em todos os modais ─────────
+   Mobile e desktop: sempre flex, sempre lado a lado.
+   ────────────────────────────────────────────────────────── */
+.par-botoes {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.par-botoes .botao-acao {
+    flex: 1;
+    margin-top: 0 !important;
+}
+
+/* ── DESKTOP (a partir de 769px) ─────────────────────────── */
+@media (min-width: 769px) {
+    .modal {
+        max-width: 500px !important;
+        width: 90% !important;
+        max-height: calc(100vh - 100px) !important;
+        transform: translate(-50%, calc(-50% - 35px)) !important;
+    }
+}

@@ -1,0 +1,404 @@
+/* ============================================================
+   MODAL DE PRODUTO — VISUAL CARDÁPIO
+   ============================================================
+
+   ESTRUTURA DE 3 ZONAS (flex-column):
+   ┌─────────────────────────────────────────┐
+   │ #cabecalho-modal-produto  → fixo        │  nome + imagem + desc
+   ├─────────────────────────────────────────┤
+   │ #corpo-modal-produto      → rolável     │  quantidade + opcionais + subtotal
+   ├─────────────────────────────────────────┤
+   │ .botoes-modal-produto     → fixo        │  botões de ação
+   └─────────────────────────────────────────┘
+   ============================================================ */
+
+
+/* ── ZONA 1: CABEÇALHO FIXO ──────────────────────────────── */
+
+#cabecalho-modal-produto {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: #f4f1ea;
+    border-radius: 15px 15px 0 0;
+    border-bottom: 1px solid var(--cinza-medio);
+}
+
+/*
+   JS injeta dentro de #cabecalho-modal-produto:
+   <div class="container-nome-produto-modal">
+       <h2 class="nome-produto-modal">Nome</h2>
+       <button class="botao-fechar-modal">×</button>
+   </div>
+   → container: position relative; h2: bloco verde 100%; fechar: absolute à direita
+*/
+
+.container-nome-produto-modal {
+    position: relative;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    box-sizing: border-box;
+}
+
+.nome-produto-modal {
+    display: block;
+    width: 100%;
+    padding: 13px 46px;
+    background: var(--verde-militar);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px var(--sombra-suave);
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--branco);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    line-height: 1.2;
+    margin: 0;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.container-nome-produto-modal .botao-fechar-modal {
+    position: absolute !important;
+    right: 22px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(0,0,0,0.22) !important;
+    color: var(--branco) !important;
+    border: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    font-size: 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    box-shadow: none !important;
+    z-index: 2 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+}
+
+
+/* ── CONTAINER IMAGEM + DESCRIÇÃO ────────────────────────── */
+/* Agrupa a moldura da imagem e a descrição num bloco coeso   */
+.container-imagem-descricao-modal {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.imagem-produto-container {
+    margin: 0;
+    border-radius: 0;
+    overflow: hidden;
+    border: none;
+    border-bottom: 1px solid var(--cinza-medio);
+    box-shadow: none;
+    background: var(--cinza-claro);
+    aspect-ratio: 2 / 1;
+    flex-shrink: 0;
+    cursor: zoom-in;
+    width: 100%;
+}
+
+.imagem-produto-modal {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.container-descricao-produto-modal {
+    padding: 10px 16px 14px;
+}
+
+.descricao-produto-modal {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--cinza-escuro);
+    line-height: 1.45;
+    text-align: center;
+    margin: 0;
+}
+
+#status-no-carrinho {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #f0f7ed;
+    border: 1px solid #c8dfc2;
+    color: #4b6b35;
+    font-weight: 800;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+
+/* ── ZONA 2: CORPO ROLÁVEL ───────────────────────────────── */
+
+#corpo-modal-produto {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+    padding: 8px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f4f1ea;
+    scroll-behavior: smooth; /* permite scrollIntoView suave ao abrir opcionais */
+}
+
+.moldura-padrao-modal {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    padding: 12px 14px;
+    margin: 0;
+}
+
+/* Controle de quantidade */
+.linha-quantidade-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label-quantidade-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.label-quantidade-modal span:first-child {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--preto);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.label-quantidade-modal .preco-unitario {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+}
+
+.controles-quantidade-modal {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.controles-quantidade-modal span {
+    font-size: 1.1rem;
+    font-weight: 900;
+    min-width: 22px;
+    text-align: center;
+    color: var(--preto);
+}
+
+/* Opcionais */
+.moldura-agrupadora-opcionais {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    padding: 10px 14px;
+    margin: 0;
+}
+
+.titulo-opcionais,
+.titulo-modal-pequeno {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.titulo-subcategoria {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--cinza-escuro);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 10px 0 6px;
+}
+
+.opcional-item-moldura {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--cinza-divisor);
+}
+
+.opcional-item-moldura:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.opcional-texto-lado-a-lado {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.opcional-nome {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--preto);
+}
+
+.opcional-preco {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--verde-militar);
+}
+
+.controles-opcional {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quantidade-opcional {
+    font-weight: 900;
+    font-size: 0.95rem;
+    min-width: 22px;
+    text-align: center;
+    color: var(--preto);
+}
+
+/* Subtotal */
+#container-subtotal-produto {
+    background: var(--branco);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    padding: 12px 14px;
+    margin: 0;
+}
+
+.linha-flex-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.subtitulo-subtotal {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: var(--marrom-cafe);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.valor-subtotal {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--verde-militar);
+}
+
+
+/* ── ZONA 3: RODAPÉ FIXO ─────────────────────────────────── */
+
+.botoes-modal-produto {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px 16px;
+    background: #f4f1ea;
+    border-top: 1px solid var(--cinza-medio);
+}
+
+/* Subtotal preso no topo do rodapé, acima dos botões */
+.botoes-modal-produto #container-subtotal-produto {
+    margin: 0 0 2px;
+}
+
+
+.botao-continuar-comprando {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--cinza-fundo);
+    color: var(--marrom-cafe);
+    border: 1px solid var(--cinza-medio);
+    border-radius: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.botao-ver-carrinho-modal {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--verde-militar);
+    color: var(--branco);
+    border: none;
+    border-radius: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1rem;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px var(--sombra-suave);
+}
+
+
+/* ── DESKTOP ─────────────────────────────────────────────── */
+
+@media (min-width: 769px) {
+    .nome-produto-modal      { font-size: 1.3rem; }
+    .label-quantidade-modal .preco-unitario { font-size: 1.1rem; }
+    .valor-subtotal          { font-size: 1.4rem; }
+
+}
+
+
+/* ── SCROLL AO ABRIR OPCIONAIS ───────────────────────────── */
+/*
+   Quando o usuário toca em "+" e os opcionais são revelados,
+   o JS deve fazer:
+
+       const tituloOpcionais = document.querySelector('.moldura-agrupadora-opcionais');
+       if (tituloOpcionais) {
+           tituloOpcionais.scrollIntoView({ behavior: 'smooth', block: 'start' });
+       }
+
+   O scroll-behavior: smooth acima garante a animação suave.
+*/
+
+/* Classe aplicada pelo JS enquanto rola — evita bouncing duplo */
+.rolando-para-opcionais {
+    pointer-events: none;
+}

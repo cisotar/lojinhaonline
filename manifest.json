@@ -1,0 +1,30 @@
+{
+  "short_name": "Pão do Ciso",
+  "name": "Pão do Ciso - Padaria Artesanal",
+  "icons": [
+    {
+      "src": "img/logo72x72.png",
+      "type": "image/png",
+      "sizes": "72x72",
+      "purpose": "any"
+    },
+    {
+      "src": "img/logo192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "img/logo512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#332616",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#2d3a27",
+  "description": "Encomende seus pães artesanais com facilidade."
+}
