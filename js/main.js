@@ -67,7 +67,7 @@ function inicializarSistema() {
 }
 
 // ── INICIALIZAÇÃO ────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
     log('DOM carregado, iniciando...');
 
     // Garante fallbacks mínimos caso utils.js não tenha carregado ainda
@@ -77,30 +77,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!window.formatarMoeda) {
         window.formatarMoeda = valor =>
             parseFloat(valor || 0).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
-    }
-
-    // Aguarda firebase.js (módulo ES) terminar de inicializar
-    if (window._firebasePromise) {
-        await window._firebasePromise;
-    }
-
-    // Tenta carregar dados do Firestore; fallback para dados.js
-    if (typeof window.carregarDadosFirestore === 'function') {
-        try {
-            const dadosRemoto = await window.carregarDadosFirestore();
-            if (dadosRemoto) {
-                Object.keys(dadosRemoto).forEach(chave => {
-                    if (dadosRemoto[chave] !== null) {
-                        window.dadosIniciais[chave] = dadosRemoto[chave];
-                    }
-                });
-                log('✅ Dados carregados do Firestore.');
-            } else {
-                log('ℹ️ Nenhum dado no Firestore. Usando dados.js.');
-            }
-        } catch (err) {
-            console.warn('⚠️ Falha ao buscar Firestore. Usando dados.js.', err);
-        }
     }
 
     // Verifica se dados essenciais estão disponíveis
