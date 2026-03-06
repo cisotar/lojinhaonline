@@ -4,7 +4,7 @@
 // ============================================
 
 import { initializeApp }                    from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
     apiKey:            "AIzaSyAJuUsq61-NcX70GjCmrnrPiwIXsJL9Ym4",
