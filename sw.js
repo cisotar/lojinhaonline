@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pao-do-ciso-v5';
+const CACHE_NAME = 'pao-do-ciso-v7';
 
 const ASSETS_ESSENCIAIS = [
     './',
