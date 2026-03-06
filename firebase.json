@@ -1,0 +1,29 @@
+cat > ~/github/lojinhaonline/firebase.json << 'EOF'
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "_legado/**",
+      "refatoracao/**",
+      "apps-teste/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(jpg|jpeg|webp|png|gif|svg|ico)",
+        "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [{"key": "Cache-Control", "value": "public, max-age=604800"}]
+      },
+      {
+        "source": "index.html",
+        "headers": [{"key": "Cache-Control", "value": "public, max-age=0, must-revalidate"}]
+      }
+    ]
+  }
+}
+EOF
