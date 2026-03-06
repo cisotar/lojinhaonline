@@ -3,17 +3,16 @@
 // Inicialização e funções de persistência
 // ============================================
 
-import { initializeApp }                    from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore-lite.js";
+import { initializeApp }                    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
-    apiKey:            "AIzaSyAJuUsq61-NcX70GjCmrnrPiwIXsJL9Ym4",
-    authDomain:        "pao-do-ciso.firebaseapp.com",
-    projectId:         "pao-do-ciso",
-    storageBucket:     "pao-do-ciso.firebasestorage.app",
-    messagingSenderId: "641938120307",
-    appId:             "1:641938120307:web:5e1f3294b6c4db4fe85406",
-    measurementId:     "G-22XC11WE9E"
+    apiKey:            "AIzaSyBDdm8aTGEBoVlrYuuYts-yj0PYjqyE5-U",
+    authDomain:        "padociso.firebaseapp.com",
+    projectId:         "padociso",
+    storageBucket:     "padociso.firebasestorage.app",
+    messagingSenderId: "448113897132",
+    appId:             "1:448113897132:web:12f7cfef86cd6ec73a3909"
 };
 
 const _app = initializeApp(firebaseConfig);

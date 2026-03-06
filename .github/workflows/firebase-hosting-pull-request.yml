@@ -16,5 +16,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PAO_DO_CISO }}
-          projectId: pao-do-ciso
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PADOCISO }}
+          projectId: padociso

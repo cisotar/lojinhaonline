@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "pao-do-ciso"
-  }
+    "default": "padociso",
+    "paodocisowebapp": "padociso"
+  },
+  "targets": {},
+  "etags": {}
 }
