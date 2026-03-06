@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pao-do-ciso-v7';
+const CACHE_NAME = 'pao-do-ciso-v8';
 
 const ASSETS_ESSENCIAIS = [
     './',
@@ -67,25 +67,35 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// ── FETCH: tenta rede, cai no cache se offline ───────────────────
+// ── FETCH: cache-first para imagens, network-first para o resto ──
 self.addEventListener('fetch', event => {
-    // Ignora requisições de outros domínios que não estão no cache
+    // Ignora requisições de outros domínios
     // (ex: ViaCEP, OneSignal) — deixa o browser tratar normalmente
     const url = new URL(event.request.url);
     if (url.origin !== self.location.origin) return;
 
-    event.respondWith(
-        fetch(event.request)
-            .then(resposta => {
-                // Armazena imagens dinamicamente no cache ao buscá-las pela rede
-                if (event.request.destination === 'image') {
+    // Imagens: serve do cache imediatamente, busca na rede só se não tiver
+    if (event.request.destination === 'image') {
+        event.respondWith(
+            caches.match(event.request).then(cached => {
+                if (cached) return cached;
+                return fetch(event.request).then(resposta => {
                     const respostaClonada = resposta.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, respostaClonada);
                     });
-                }
-                return resposta;
+                    return resposta;
+                }).catch(() => caches.match(event.request)
+                    .then(c => c || new Response('Offline', { status: 503 }))
+                );
             })
+        );
+        return;
+    }
+
+    // Demais recursos: network-first, cai no cache se offline
+    event.respondWith(
+        fetch(event.request)
             .catch(() => caches.match(event.request)
                 .then(cached => cached || new Response('Offline', { status: 503 }))
             )
