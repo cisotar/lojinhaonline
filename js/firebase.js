@@ -7,12 +7,12 @@ import { initializeApp }                    from "https://www.gstatic.com/fireba
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore-lite.js";
 
 const firebaseConfig = {
-    apiKey:            "AIzaSyBDdm8aTGEBoVlrYuuYts-yj0PYjqyE5-U",
-    authDomain:        "padociso.firebaseapp.com",
-    projectId:         "padociso",
-    storageBucket:     "padociso.firebasestorage.app",
-    messagingSenderId: "448113897132",
-    appId:             "1:448113897132:web:12f7cfef86cd6ec73a3909"
+    apiKey:            "AIzaSyBbPOYFCi6IaVMk889zsxEwr8NjKuVTUPk",
+    authDomain:        "nanopadariapaodociso.firebaseapp.com",
+    projectId:         "nanopadariapaodociso",
+    storageBucket:     "nanopadariapaodociso.firebasestorage.app",
+    messagingSenderId: "23220999316",
+    appId:             "1:23220999316:web:72ceb7cc8f00798524d081"
 };
 
 const _app = initializeApp(firebaseConfig);
