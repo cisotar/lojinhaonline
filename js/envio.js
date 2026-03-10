@@ -30,19 +30,35 @@ function enviarPedidoParaPlanilha(dadosCliente) {
                         resumoItens += `   └ ${item.opcionais[opc].quantidade}x ${opc}\n`;
                     });
                 }
+
+                if (item.observacao && item.observacao.trim()) {
+                    resumoItens += `   📝 ${item.observacao.trim()}\n`;
+                }
             }
         });
     }
 
     // 2. Preparar o objeto com as colunas exatamente como na planilha
+    let todasObservacoes = "";
+    if (typeof carrinho !== "undefined") {
+        Object.values(carrinho).forEach(item => {
+            const secao = dadosIniciais?.secoes?.[item.indiceSessao];
+            const produto = secao?.itens?.[item.indiceItem];
+            if (produto && item.observacao && item.observacao.trim()) {
+                todasObservacoes += `${produto.nome}: ${item.observacao.trim()}\n`;
+            }
+        });
+    }
+
     const dados = {
-        data: new Date().toLocaleString('pt-BR'),
+        data: new Date().toLocaleString("pt-BR"),
         nome: dadosCliente.nome,
         telefone: dadosCliente.whatsapp,
         endereco: dadosCliente.endereco,
         pedido: resumoItens.trim(),
         forma_pagamento: dadosCliente.metodoPagamento,
-        total: estadoAplicativo.totalGeral
+        total: estadoAplicativo.totalGeral,
+        observacoes: todasObservacoes.trim()
     };
 
     // 3. Executar o envio
@@ -189,6 +205,9 @@ function gerarMensagemWhatsApp(nome, whatsapp, endereco, metodoPagamento) {
                 itensTexto += `• ${item.quantidade}x ${produto.nome} (${formatarMoeda(subtotalItem)})\n`;
                 if (listaOpcionaisTexto) {
                     itensTexto += listaOpcionaisTexto;
+                }
+                if (item.observacao && item.observacao.trim()) {
+                    itensTexto += `   📝 _${item.observacao.trim()}_\n`;
                 }
             }
         });

@@ -21,8 +21,9 @@ function configurarProduto(indiceSessao, indiceItem) {
             identificador: identificador,
             indiceSessao: indiceSessao,
             indiceItem: indiceItem,
-            quantidade: 0, 
-            opcionais: {}
+            quantidade: 0,
+            opcionais: {},
+            observacao: ''
         };
     }
 
@@ -213,6 +214,24 @@ function renderizarModalProduto(produto) {
         <div id="secao-opcionais-dinamica">
             ${gerarHTMLSecaoOpcionais(produto)}
         </div>
+
+        ${produtoAtual.quantidade > 0 ? `
+        <div class="moldura-observacoes">
+            <div class="titulo-observacoes">
+                <i class="fas fa-pencil-alt"></i>
+                OBSERVAÇÕES
+                <span class="badge-observacao-opcional">opcional</span>
+            </div>
+            <textarea
+                id="observacoes-produto"
+                class="textarea-observacoes"
+                maxlength="200"
+                placeholder="Ex: sem cebola, pão bem passado, alergia a glúten…"
+                oninput="salvarObservacao(this)"
+            >${produtoAtual.observacao || ''}</textarea>
+            <span class="contador-observacoes" id="contador-observacoes">${(produtoAtual.observacao || '').length} / 200</span>
+        </div>
+        ` : ''}
     `;
 
     // Subtotal preso no rodapé fixo
@@ -236,7 +255,10 @@ function alterarQuantidadeProduto(valor) {
     if (novaQuantidade === produtoAtual.quantidade) return;
     const eraZero = produtoAtual.quantidade === 0;
     produtoAtual.quantidade = novaQuantidade;
-    if (produtoAtual.quantidade === 0) produtoAtual.opcionais = {};
+    if (produtoAtual.quantidade === 0) {
+        produtoAtual.opcionais = {};
+        produtoAtual.observacao = '';
+    }
     const produtoBase = dadosIniciais.secoes[produtoAtual.indiceSessao].itens[produtoAtual.indiceItem];
     renderizarModalProduto(produtoBase);
     sincronizarProdutoNoCarrinho();
@@ -251,6 +273,19 @@ function alterarQuantidadeProduto(valor) {
                 secaoOpcionais.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
+    }
+}
+
+function salvarObservacao(el) {
+    produtoAtual.observacao = el.value;
+    sincronizarProdutoNoCarrinho();
+    const contador = document.getElementById('contador-observacoes');
+    if (contador) {
+        const len = el.value.length;
+        contador.textContent = `${len} / 200`;
+        contador.className = 'contador-observacoes';
+        if (len > 160) contador.classList.add('aviso');
+        if (len >= 195) contador.classList.add('limite');
     }
 }
 
@@ -301,6 +336,7 @@ window.PaoDoCiso.alterarQuantidadeProduto = alterarQuantidadeProduto;
 window.PaoDoCiso.gerarHTMLSecaoOpcionais  = gerarHTMLSecaoOpcionais;
 window.PaoDoCiso.adicionarItemAoCarrinho  = adicionarItemAoCarrinho;
 window.PaoDoCiso.adicionarEIrParaCarrinho = adicionarEIrParaCarrinho;
+window.PaoDoCiso.salvarObservacao         = salvarObservacao;
 
 // Aliases de compatibilidade
 window.configurarProduto = configurarProduto;
@@ -309,3 +345,4 @@ window.alterarQuantidadeProduto = alterarQuantidadeProduto;
 window.gerarHTMLSecaoOpcionais = gerarHTMLSecaoOpcionais;
 window.adicionarItemAoCarrinho = adicionarItemAoCarrinho;
 window.adicionarEIrParaCarrinho = adicionarEIrParaCarrinho;
+window.salvarObservacao = salvarObservacao;
