@@ -13,7 +13,7 @@ window.dadosIniciais = {
 },
 
     fornada: {
-  "dataISO": "2026-03-06",
+  "dataISO": "2026-03-13",
   "diasAntecedencia": 2,
   "horaLimite": "23:59h"
 },
