@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modal Produto – Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  /* ── TOKENS ────────────────────────────────────────────── */
+  :root {
+    --cafe:        #332616;
+    --cafe-mid:    #5a3d1e;
+    --marrom:      #7a4f28;
+    --bege-claro:  #f5eee4;
+    --bege:        #ede4d6;
+    --bege-escuro: #d6c8b2;
+    --verde:       #4b6b35;
+    --verde-light: #e8f0e1;
+    --verde-mid:   #6a8f50;
+    --creme:       #faf6f0;
+    --cinza:       #e8e4df;
+    --cinza-mid:   #bbb5ad;
+    --texto:       #2a1f12;
+    --subtexto:    #6e5e4a;
+    --vermelho:    #c0392b;
+    --vermelho-bg: #fdf0ee;
+    --ouro:        #c89a3c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1a120a url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── OVERLAY ────────────────────────────────────────────── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(20, 12, 4, 0.72);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-end;        /* bottom-sheet em mobile */
+    justify-content: center;
+    z-index: 1000;
+    padding: 0;
+  }
+
+  /* ── MODAL SHELL ─────────────────────────────────────────── */
+  .modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 92vh;
+    background: var(--creme);
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -8px 48px rgba(0,0,0,0.35);
+    animation: slideUp .35s cubic-bezier(.22,.88,.34,1) both;
+    position: relative;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  /* ── DRAG HANDLE ─────────────────────────────────────────── */
+  .drag-handle {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 4px;
+    background: var(--bege-escuro);
+    border-radius: 99px;
+    z-index: 2;
+  }
+
+  /* ── CABEÇALHO HERO ──────────────────────────────────────── */
+  .modal-hero {
+    flex-shrink: 0;
+    background: var(--cafe);
+    padding: 28px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+
+  /* Ornamento arabesco sutil */
+  .modal-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0 Q25 10 20 20 Q15 10 20 0Z' fill='%23ffffff' fill-opacity='0.025'/%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+  }
+
+  /* Moldura quadrada discreta com dupla borda */
+  .imagem-frame {
+    position: relative;
+    width: 148px;
+    height: 148px;
+    flex-shrink: 0;
+  }
+
+  .imagem-frame::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--ouro) 0%, transparent 50%, var(--ouro) 100%);
+    opacity: .55;
+  }
+
+  .imagem-frame::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: var(--cafe-mid);
+    z-index: 0;
+  }
+
+  .imagem-frame img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+    border: 2px solid var(--marrom);
+  }
+
+  /* Badge categoria sobre a imagem */
+  .badge-categoria {
+    position: absolute;
+    top: -10px; right: -10px;
+    z-index: 2;
+    background: var(--ouro);
+    color: var(--cafe);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 2px solid var(--cafe);
+    white-space: nowrap;
+  }
+
+  .hero-texto {
+    text-align: center;
+    z-index: 1;
+  }
+
+  .hero-nome {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--bege-claro);
+    line-height: 1.2;
+    letter-spacing: .2px;
+    margin-bottom: 6px;
+  }
+
+  .hero-descricao {
+    font-size: 0.78rem;
+    color: var(--bege-escuro);
+    line-height: 1.5;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .hero-preco {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--ouro);
+    font-weight: 700;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .hero-preco::before,
+  .hero-preco::after {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--ouro);
+    opacity: .5;
+  }
+
+  /* ── BADGE "NO CARRINHO" ────────────────────────────────── */
+  .badge-carrinho {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--verde-light);
+    border-top: 1px solid #c4dba8;
+    border-bottom: 1px solid #c4dba8;
+    padding: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--verde);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    flex-shrink: 0;
+  }
+
+  .badge-carrinho.visivel { display: flex; }
+
+  /* ── CORPO ROLÁVEL ───────────────────────────────────────── */
+  .modal-corpo {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+  }
+
+  .modal-corpo::-webkit-scrollbar { width: 3px; }
+  .modal-corpo::-webkit-scrollbar-track { background: transparent; }
+  .modal-corpo::-webkit-scrollbar-thumb { background: var(--bege-escuro); border-radius: 99px; }
+
+  /* ── CONTROLE DE QUANTIDADE ─────────────────────────────── */
+  .secao-quantidade {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--creme);
+    border-bottom: 1px solid var(--cinza);
+  }
+
+  .qtd-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    font-weight: 700;
+    color: var(--subtexto);
+  }
+
+  .qtd-label span {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--cinza-mid);
+    font-weight: 500;
+    margin-top: 2px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .controle-qtd {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--bege);
+    border-radius: 12px;
+    border: 1px solid var(--bege-escuro);
+    overflow: hidden;
+  }
+
+  .btn-qtd {
+    width: 40px; height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cafe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+  }
+
+  .btn-qtd:hover { background: var(--bege-escuro); }
+  .btn-qtd:active { background: var(--cinza); }
+
+  .qtd-valor {
+    min-width: 36px;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--cafe);
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* ── SEÇÃO OPCIONAIS ────────────────────────────────────── */
+  .secao-opcionais { padding: 0; }
+
+  .opcionais-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px 10px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    color: var(--subtexto);
+    border-bottom: 1px solid var(--cinza);
+    background: var(--bege-claro);
+  }
+
+  .opcionais-titulo i {
+    color: var(--verde-mid);
+    font-size: 0.75rem;
+  }
+
+  .categoria-grupo { border-bottom: 1px solid var(--cinza); }
+
+  .categoria-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 800;
+    color: var(--ouro);
+    padding: 10px 24px 4px;
+    background: var(--creme);
+    display: block;
+  }
+
+  .opcional-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 24px;
+    border-bottom: 1px solid var(--cinza);
+    background: var(--creme);
+    transition: background .15s;
+  }
+
+  .opcional-item:hover { background: var(--bege-claro); }
+  .opcional-item:last-child { border-bottom: none; }
+
+  .opcional-info-wrap { display: flex; flex-direction: column; gap: 2px; }
+
+  .opcional-nome {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--texto);
+  }
+
+  .opcional-preco {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--verde);
+  }
+
+  /* Mini controle inline */
+  .mini-controle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .btn-mini {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--bege-escuro);
+    border-radius: 8px;
+    background: var(--bege);
+    color: var(--cafe);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    line-height: 1;
+  }
+
+  .btn-mini:hover { background: var(--cafe); color: var(--bege-claro); border-color: var(--cafe); }
+
+  .mini-qtd {
+    min-width: 24px;
+    text-align: center;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--cafe);
+  }
+
+  .mini-qtd.ativo { color: var(--verde); }
+
+  /* ── SUBTOTAL ────────────────────────────────────────────── */
+  .secao-subtotal {
+    margin: 0;
+    padding: 14px 24px;
+    background: var(--vermelho-bg);
+    border-top: 1px solid #f0c8c3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .subtotal-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    color: var(--vermelho);
+  }
+
+  .subtotal-valor {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--vermelho);
+  }
+
+  /* ── RODAPÉ BOTÕES ───────────────────────────────────────── */
+  .modal-footer {
+    flex-shrink: 0;
+    padding: 14px 20px 20px;
+    background: var(--creme);
+    border-top: 1px solid var(--cinza);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-principal {
+    width: 100%;
+    padding: 16px;
+    background: var(--verde);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(75,107,53,.35);
+    transition: all .2s;
+    display: none;
+  }
+
+  .btn-principal:hover {
+    background: #3d5829;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(75,107,53,.4);
+  }
+
+  .btn-principal.visivel { display: flex; }
+
+  .btn-secundario {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: var(--cafe);
+    border: 1.5px solid var(--bege-escuro);
+    border-radius: 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-secundario:hover {
+    background: var(--bege);
+    border-color: var(--cinza-mid);
+  }
+
+  /* ── DEMO CONTAINER ─────────────────────────────────────── */
+  .demo-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .demo-tag {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,.6);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    letter-spacing: .5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-stage">
+  <div class="demo-tag">✦ Modal Produto — Redesign Interativo</div>
+
+  <div class="overlay" style="position:relative; inset:auto; backdrop-filter:none; background:none; padding:0; border-radius:28px; overflow:hidden; width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.4);">
+    <div class="modal" style="border-radius:28px; max-height:85vh;">
+      
+      <div class="drag-handle"></div>
+
+      <!-- ── HERO ── -->
+      <div class="modal-hero">
+        <!-- Moldura quadrada da imagem -->
+        <div class="imagem-frame">
+          <span class="badge-categoria">Artesanal</span>
+          <img src="https://images.unsplash.com/photo-1585478259715-1a9c1c8a5bb7?w=400&h=400&fit=crop" alt="Panini Caprese">
+        </div>
+
+        <div class="hero-texto">
+          <p class="hero-nome">Panini Caprese</p>
+          <p class="hero-descricao">Pão ciabatta artesanal com muçarela de búfala, tomate-cereja e manjericão fresco.</p>
+          <p class="hero-preco">R$ 28,00</p>
+        </div>
+      </div>
+
+      <!-- ── BADGE CARRINHO ── -->
+      <div class="badge-carrinho" id="badge-carrinho">
+        <i class="fas fa-check-circle"></i> Item adicionado ao carrinho
+      </div>
+
+      <!-- ── CORPO ── -->
+      <div class="modal-corpo">
+
+        <!-- Quantidade -->
+        <div class="secao-quantidade">
+          <div class="qtd-label">
+            Quantidade
+            <span>Cada unidade · R$ 28,00</span>
+          </div>
+          <div class="controle-qtd">
+            <button class="btn-qtd" onclick="alterarQtd(-1)">−</button>
+            <span class="qtd-valor" id="qtd-produto">0</span>
+            <button class="btn-qtd" onclick="alterarQtd(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Opcionais (aparece após qtd > 0) -->
+        <div class="secao-opcionais" id="secao-opcionais" style="display:none;">
+          <div class="opcionais-titulo">
+            <i class="fas fa-layer-group"></i> Adicionar Opcionais
+          </div>
+
+          <!-- Grupo: Proteínas -->
+          <div class="categoria-grupo">
+            <span class="categoria-label">Proteínas</span>
+
+            <div class="opcional-item">
+              <div class="opcional-info-wrap">
+                <span class="opcional-nome">Presunto Parma</span>
+                <span class="opcional-preco">+ R$ 9,00</span>
+              </div>
+              <div class="mini-controle">
+                <button class="btn-mini" onclick="alterarOpcional(this, -1)">−</button>
+                <span class="mini-qtd">0</span>
+                <button class="btn-mini" onclick="alterarOpcional(this, 1)">+</button>
+              </div>
+            </div>
+
+            <div class="opcional-item">
+              <div class="opcional-info-wrap">
+                <span class="opcional-nome">Frango Grelhado</span>
+                <span class="opcional-preco">+ R$ 7,00</span>
+              </div>
+              <div class="mini-controle">
+                <button class="btn-mini" onclick="alterarOpcional(this, -1)">−</button>
+                <span class="mini-qtd">0</span>
+                <button class="btn-mini" onclick="alterarOpcional(this, 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grupo: Queijos -->
+          <div class="categoria-grupo">
+            <span class="categoria-label">Queijos</span>
+
+            <div class="opcional-item">
+              <div class="opcional-info-wrap">
+                <span class="opcional-nome">Brie Extra</span>
+                <span class="opcional-preco">+ R$ 8,00</span>
+              </div>
+              <div class="mini-controle">
+                <button class="btn-mini" onclick="alterarOpcional(this, -1)">−</button>
+                <span class="mini-qtd">0</span>
+                <button class="btn-mini" onclick="alterarOpcional(this, 1)">+</button>
+              </div>
+            </div>
+
+            <div class="opcional-item">
+              <div class="opcional-info-wrap">
+                <span class="opcional-nome">Parmesão Ralado</span>
+                <span class="opcional-preco">+ R$ 4,00</span>
+              </div>
+              <div class="mini-controle">
+                <button class="btn-mini" onclick="alterarOpcional(this, -1)">−</button>
+                <span class="mini-qtd">0</span>
+                <button class="btn-mini" onclick="alterarOpcional(this, 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grupo: Outros -->
+          <div class="categoria-grupo">
+            <span class="categoria-label">Outros</span>
+
+            <div class="opcional-item">
+              <div class="opcional-info-wrap">
+                <span class="opcional-nome">Azeite Trufado</span>
+                <span class="opcional-preco">+ R$ 5,00</span>
+              </div>
+              <div class="mini-controle">
+                <button class="btn-mini" onclick="alterarOpcional(this, -1)">−</button>
+                <span class="mini-qtd">0</span>
+                <button class="btn-mini" onclick="alterarOpcional(this, 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtotal -->
+          <div class="secao-subtotal" id="secao-subtotal">
+            <span class="subtotal-label">Subtotal do item</span>
+            <span class="subtotal-valor" id="subtotal-valor">R$ 0,00</span>
+          </div>
+        </div>
+
+      </div><!-- /modal-corpo -->
+
+      <!-- ── FOOTER ── -->
+      <div class="modal-footer">
+        <button class="btn-principal" id="btn-verde" onclick="irParaCarrinho()">
+          <i class="fas fa-shopping-bag"></i> Ver Carrinho
+        </button>
+        <button class="btn-secundario" onclick="adicionarSimples()">
+          Adicionar ao Carrinho
+        </button>
+      </div>
+
+    </div><!-- /modal -->
+  </div><!-- /overlay -->
+</div>
+
+<script>
+  const PRECO_BASE = 28;
+  let quantidade = 0;
+
+  // Mapa de opcionais: {elemento → {preco, qtd}}
+  const opcionaisMap = new WeakMap();
+
+  // Inicializa opcionais
+  document.querySelectorAll('.opcional-item').forEach(item => {
+    const precoTexto = item.querySelector('.opcional-preco').textContent;
+    const preco = parseFloat(precoTexto.replace(/[^\d,]/g, '').replace(',', '.'));
+    opcionaisMap.set(item, { preco, qtd: 0 });
+  });
+
+  function formatarMoeda(v) {
+    return 'R$ ' + v.toFixed(2).replace('.', ',');
+  }
+
+  function calcularSubtotal() {
+    let total = PRECO_BASE * quantidade;
+    document.querySelectorAll('.opcional-item').forEach(item => {
+      const d = opcionaisMap.get(item);
+      total += d.preco * d.qtd;
+    });
+    return total;
+  }
+
+  function atualizarUI() {
+    document.getElementById('qtd-produto').textContent = quantidade;
+    document.getElementById('secao-opcionais').style.display = quantidade > 0 ? 'block' : 'none';
+    document.getElementById('badge-carrinho').classList.toggle('visivel', quantidade > 0);
+    document.getElementById('btn-verde').classList.toggle('visivel', quantidade > 0);
+    document.getElementById('subtotal-valor').textContent = formatarMoeda(calcularSubtotal());
+  }
+
+  function alterarQtd(delta) {
+    quantidade = Math.max(0, quantidade + delta);
+    if (quantidade === 0) {
+      document.querySelectorAll('.opcional-item').forEach(item => {
+        const d = opcionaisMap.get(item);
+        d.qtd = 0;
+        item.querySelector('.mini-qtd').textContent = '0';
+        item.querySelector('.mini-qtd').classList.remove('ativo');
+      });
+    }
+    atualizarUI();
+  }
+
+  function alterarOpcional(btn, delta) {
+    const item = btn.closest('.opcional-item');
+    const d = opcionaisMap.get(item);
+    d.qtd = Math.max(0, d.qtd + delta);
+    const span = item.querySelector('.mini-qtd');
+    span.textContent = d.qtd;
+    span.classList.toggle('ativo', d.qtd > 0);
+    document.getElementById('subtotal-valor').textContent = formatarMoeda(calcularSubtotal());
+  }
+
+  function adicionarSimples() {
+    if (quantidade === 0) {
+      alterarQtd(1);
+      return;
+    }
+    alert('✓ Item adicionado ao carrinho!');
+  }
+
+  function irParaCarrinho() {
+    alert('Ir para o carrinho →');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo v5 | Pão do Ciso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-bread-slice"></i></div>
+            <div class="logo-text">
+                <span class="logo-title">Pão do Ciso</span>
+                <span class="logo-sub">Gestor v5.0</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item active" id="nav-dashboard" onclick="navegarPara('dashboard')">
+                <i class="fas fa-chart-line"></i><span>Dashboard</span>
+            </div>
+            <div class="nav-item" id="nav-loja" onclick="navegarPara('loja')">
+                <i class="fas fa-store"></i><span>Loja</span>
+            </div>
+            <div class="nav-item" id="nav-produtos" onclick="navegarPara('produtos')">
+                <i class="fas fa-utensils"></i><span>Produtos</span>
+            </div>
+            <div class="nav-item" id="nav-opcionais" onclick="navegarPara('opcionais')">
+                <i class="fas fa-list-ul"></i><span>Opcionais</span>
+            </div>
+            <div class="nav-item" id="nav-logistica" onclick="navegarPara('logistica')">
+                <i class="fas fa-motorcycle"></i><span>Logística</span>
+            </div>
+            <div class="nav-item" id="nav-cupons" onclick="navegarPara('cupons')">
+                <i class="fas fa-ticket-alt"></i><span>Cupons</span>
+            </div>
+        </nav>
+        <div class="action-area">
+            <button class="btn-sidebar-action btn-firebase" onclick="salvarFirestore()" title="Salvar no Firebase">
+                <i class="fas fa-cloud-upload-alt"></i><span>Salvar Firebase</span>
+            </button>
+            <button class="btn-sidebar-action btn-local" onclick="persistir()" title="Salvar localmente">
+                <i class="fas fa-save"></i><span>Salvar Local</span>
+            </button>
+            <button class="btn-sidebar-action btn-download" onclick="baixarDados()" title="Baixar dados.js">
+                <i class="fas fa-download"></i><span>Baixar dados.js</span>
+            </button>
+            <button class="btn-sidebar-action btn-reload" onclick="carregarDadosFirestore()" title="Recarregar do Firebase">
+                <i class="fas fa-sync"></i><span>Recarregar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content" id="conteudo-principal"></div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal-container"></div>
+
+    <!-- TOAST -->
+    <div id="toast-area"></div>
+
+    <!-- TEMPLATES -->
+
+    <template id="tmpl-dashboard">
+        <header>
+            <div>
+                <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                <p class="header-sub">Visão geral do sistema</p>
+            </div>
+            <div id="firebase-status" class="firebase-badge">
+                <i class="fas fa-circle"></i> <span>Verificando...</span>
+            </div>
+        </header>
+
+        <div class="card fornada-card">
+            <div class="card-header">
+                <div class="card-title"><i class="far fa-calendar-alt"></i> Próxima Fornada</div>
+            </div>
+            <div class="fornada-grid">
+                <div class="form-group">
+                    <label>Data de Entrega</label>
+                    <input type="date" id="dash-data">
+                </div>
+                <div class="form-group">
+                    <label>Antecedência (dias)</label>
+                    <input type="number" id="dash-dias" min="0" max="30">
+                </div>
+                <div class="form-group">
+                    <label>Hora Limite</label>
+                    <input type="text" id="dash-hora" placeholder="23:59h">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="dashboard-stats"></div>
+    </template>
+
+    <template id="tmpl-loja">
+        <header>
+            <div>
+                <h1><i class="fas fa-store"></i> Configurações da Loja</h1>
+                <p class="header-sub">Dados públicos, identidade e aparência</p>
+            </div>
+        </header>
+
+        <div class="cards-2col">
+            <!-- Identidade -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-id-card"></i> Identidade</div>
+                </div>
+                <div class="form-group">
+                    <label>Nome da Loja (título do header)</label>
+                    <input type="text" id="loja-nome" placeholder="Pão do Ciso">
+                </div>
+                <div class="form-group">
+                    <label>Instagram</label>
+                    <div class="input-prefix">
+                        <span>@</span>
+                        <input type="text" id="loja-instagram" placeholder="paodociso">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp (só números, com DDI)</label>
+                    <input type="text" id="loja-whatsapp" placeholder="5511976799866">
+                </div>
+                <div class="form-group">
+                    <label>Chave Pix</label>
+                    <input type="text" id="loja-pix" placeholder="email@exemplo.com">
+                </div>
+            </div>
+
+            <!-- Cores -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-palette"></i> Cores do Site</div>
+                </div>
+                <div class="cores-grid">
+                    <div class="cor-item">
+                        <label>Fundo Creme</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-bg-creme" class="color-picker">
+                            <input type="text" id="cor-bg-creme-hex" class="color-hex">
+                        </div>
+                    </div>
+                    <div class="cor-item">
+                        <label>Verde Militar (primário)</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-verde-militar" class="color-picker">
+                            <input type="text" id="cor-verde-militar-hex" class="color-hex">
+                        </div>
+                    </div>
+                    <div class="cor-item">
+                        <label>Marrom Café (header/rodapé)</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-marrom-cafe" class="color-picker">
+                            <input type="text" id="cor-marrom-cafe-hex" class="color-hex">
+                        </div>
+                    </div>
+                    <div class="cor-item">
+                        <label>Marrom Detalhe (preços)</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-marrom-detalhe" class="color-picker">
+                            <input type="text" id="cor-marrom-detalhe-hex" class="color-hex">
+                        </div>
+                    </div>
+                    <div class="cor-item">
+                        <label>Cor do Texto</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-texto" class="color-picker">
+                            <input type="text" id="cor-texto-hex" class="color-hex">
+                        </div>
+                    </div>
+                    <div class="cor-item">
+                        <label>Vermelho Alerta</label>
+                        <div class="cor-input-wrap">
+                            <input type="color" id="cor-red" class="color-picker">
+                            <input type="text" id="cor-red-hex" class="color-hex">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-reset-cores" onclick="CRUD.resetarCores()">
+                    <i class="fas fa-undo"></i> Restaurar padrão
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <template id="tmpl-modal-produto">
+        <h2 class="modal-title">Editar Produto</h2>
+        <div class="form-group">
+            <label>Nome do Produto</label>
+            <div class="input-with-btn">
+                <input id="prod-nome">
+                <button type="button" class="btn-inline btn-google-search" title="Buscar imagem no Google">
+                    <i class="fab fa-google"></i>
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Status e Disponibilidade</label>
+            <div class="toggle-group">
+                <button type="button" id="btn-modal-vis" class="btn-toggle">
+                    <i class="fas fa-eye-slash"></i> <span>Oculto</span>
+                </button>
+                <button type="button" id="btn-modal-esg" class="btn-toggle">
+                    <i class="fas fa-check"></i> <span>Disponível</span>
+                </button>
+            </div>
+        </div>
+        <div class="form-group"><label>Descrição</label><textarea id="prod-desc" rows="3"></textarea></div>
+        <div class="form-2col">
+            <div class="form-group">
+                <label>Preço (R$)</label>
+                <input type="number" step="0.5" min="0" id="prod-preco">
+            </div>
+            <div class="form-group">
+                <label>Imagem (caminho)</label>
+                <div class="input-with-btn">
+                    <input id="prod-img">
+                    <button type="button" class="btn-inline btn-open-file" title="Selecionar arquivo">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                </div>
+                <input type="file" id="file-input" accept="image/*" style="display:none">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Opcionais Ativos (clique para ativar/desativar)</label>
+            <div id="opcionais-container" class="badges-container"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-confirm" id="btn-salvar-produto">Salvar Produto</button>
+        </div>
+    </template>
+
+    <template id="tmpl-secao-produto">
+        <div class="card secao-card" draggable="true">
+            <div class="card-header secao-header-drag">
+                <div class="card-title">
+                    <i class="fas fa-grip-vertical drag-handle"></i>
+                    <span class="nome-da-sessao"></span>
+                </div>
+                <div class="botoes-sessao"></div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-drag"></th>
+                        <th class="col-prod">Produto</th>
+                        <th class="col-preco">Preço</th>
+                        <th class="col-status">Status</th>
+                        <th class="col-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="corpo-produtos"></tbody>
+            </table>
+        </div>
+    </template>
+
+    <template id="tmpl-gestao-opcionais">
+        <header>
+            <div>
+                <h1><i class="fas fa-list-ul"></i> Opcionais</h1>
+                <p class="header-sub">Grupos e preços de acompanhamentos</p>
+            </div>
+        </header>
+        <div id="container-lista-mestra-ops"></div>
+    </template>
+
+    <template id="tmpl-logistica">
+        <header>
+            <div>
+                <h1><i class="fas fa-motorcycle"></i> Logística</h1>
+                <p class="header-sub">Taxas de entrega por região</p>
+            </div>
+        </header>
+        <div class="cards-2col">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-tag"></i> Taxa Geral</div>
+                </div>
+                <p style="color:#666; font-size:0.88rem; margin-bottom:14px;">Aplicada quando o bairro não é encontrado na lista abaixo.</p>
+                <div class="form-group" style="max-width:180px;">
+                    <label>Valor Padrão (R$)</label>
+                    <input type="number" step="0.5" min="0" id="log-taxa-geral">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-map-marker-alt"></i> Bairros e Taxas</div>
+                    <span id="bairros-count" class="badge-count">0</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bairro</th>
+                            <th style="width:120px">Taxa (R$)</th>
+                            <th style="width:40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo-tabela-bairros"></tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="tmpl-cupons">
+        <header>
+            <div>
+                <h1><i class="fas fa-ticket-alt"></i> Cupons</h1>
+                <p class="header-sub">Descontos promocionais</p>
+            </div>
+            <button class="btn-add" id="btn-novo-cupom">
+                <i class="fas fa-plus"></i> Novo Cupom
+            </button>
+        </header>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th style="width:80px">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela-cupons"></tbody>
+            </table>
+        </div>
+    </template>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
